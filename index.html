@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#ffe3ee">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Питомец для Аяу 🐾</title>
+<style>
+@property --wall{syntax:'<color>';inherits:true;initial-value:#ffeef2}
+@property --floor{syntax:'<color>';inherits:true;initial-value:#f6dcc0}
+@property --sky1{syntax:'<color>';inherits:true;initial-value:#9fd6ff}
+@property --sky2{syntax:'<color>';inherits:true;initial-value:#e6f6ff}
+@property --tint{syntax:'<color>';inherits:true;initial-value:rgba(255,255,255,0)}
+@property --stars{syntax:'<number>';inherits:true;initial-value:0}
+@property --sun{syntax:'<number>';inherits:true;initial-value:1}
+:root{--ink:#5a4a63;--ink2:#8f7f9b;--card:rgba(255,255,255,.74);--shadow:0 8px 24px rgba(160,120,170,.22);--pink:#ff9ec1;--lav:#cdb4ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:"Nunito","Quicksand",ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:linear-gradient(160deg,#fff4ec 0%,#ffe3ee 50%,#e9dcff 100%);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+h2,h3,p{margin:0}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:520px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top)) 12px calc(8px + env(safe-area-inset-bottom));gap:8px}
+#top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.who{display:flex;align-items:center;gap:8px;font-size:20px}
+.who b{font-weight:800}
+.right{display:flex;gap:8px;align-items:center}
+.pill{position:relative;background:var(--card);box-shadow:var(--shadow);border-radius:22px;padding:0 14px;height:42px;font-weight:800;display:inline-flex;align-items:center;gap:6px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.round{width:44px;height:44px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);font-size:20px}
+.coinpop{position:absolute;right:8px;top:-4px;font-weight:800;color:#e0709a;animation:rise 1.3s ease-out forwards;pointer-events:none;--dx:0px;--dy:-30px}
+#stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--card);border-radius:16px;padding:7px 8px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(160,120,170,.12);min-height:34px}
+.stat .ico{font-size:15px}
+.bar{flex:1;height:8px;border-radius:6px;background:rgba(150,110,170,.18);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#ff9ec1,#ffc2d6);transition:width .6s}
+.stat.low .bar i{background:linear-gradient(90deg,#ff7a8a,#ffa6a6)}
+.stat.low{animation:pulse 1.4s ease-in-out infinite}
+#roomWrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+#room{position:relative;border-radius:28px;overflow:hidden;box-shadow:var(--shadow);transition:--wall 6s,--floor 6s,--sky1 6s,--sky2 6s,--tint 6s,--stars 6s,--sun 6s;width:300px;height:333px;touch-action:manipulation}
+.tod-morning{--wall:#fff0e1;--floor:#f3d9b8;--sky1:#ffd0a8;--sky2:#fff3d6;--tint:rgba(255,190,140,.10);--stars:0;--sun:1}
+.tod-day{--wall:#ffeef2;--floor:#f6dcc0;--sky1:#9fd6ff;--sky2:#e6f6ff;--tint:rgba(255,255,255,0);--stars:0;--sun:1}
+.tod-evening{--wall:#f9dfe6;--floor:#e8c4a8;--sky1:#ff9bb0;--sky2:#ffd3a8;--tint:rgba(255,120,110,.14);--stars:.25;--sun:.7}
+.tod-night{--wall:#e5dcf0;--floor:#cdb7b6;--sky1:#27244f;--sky2:#4b3f7c;--tint:rgba(30,30,95,.38);--stars:1;--sun:0}
+#roomSvg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.wall-base{fill:var(--wall)}.floor{fill:var(--floor)}.tint{fill:var(--tint);pointer-events:none}
+.sk1{stop-color:var(--sky1)}.sk2{stop-color:var(--sky2)}
+.sun{opacity:var(--sun)}.moonw,.wstar{opacity:var(--stars)}
+.cloud{animation:drift 22s linear infinite alternate}
+.glow{opacity:0;transition:opacity 1.5s;pointer-events:none}
+#room.lamp-on .glow{opacity:.95}
+.bulb{animation:twinkle 2.2s ease-in-out infinite}
+[data-hit]{cursor:pointer}
+.ballin.bounce{animation:ballb .6s ease-in-out 4}
+.teddyin.hop{animation:ballb .5s ease-in-out 2}
+#pet{position:absolute;width:38%;left:30%;bottom:5%;z-index:3;pointer-events:none}
+#petBody{pointer-events:auto;cursor:pointer;transform-origin:50% 92%;animation:breathe 3.2s ease-in-out infinite}
+.pet-svg{width:100%;display:block;overflow:visible;transition:transform .25s}
+#thought{position:absolute;top:-4%;left:50%;transform:translateX(-50%);font-size:20px;background:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;box-shadow:var(--shadow);opacity:0;transition:opacity .3s;pointer-events:none}
+#thought.on{opacity:1;animation:floaty 2s ease-in-out infinite}
+.fx{visibility:hidden}
+[data-face=normal] .e-open,[data-face=normal] .m-smile,
+[data-face=happy] .e-open,[data-face=happy] .m-big,
+[data-face=sad] .e-open,[data-face=sad] .brow,[data-face=sad] .m-sad,
+[data-face=sleep] .e-closed,[data-face=sleep] .m-flat,
+[data-face=eat] .e-open,[data-face=eat] .m-open,
+[data-face=love] .e-happy,[data-face=love] .m-big,
+[data-face=yawn] .e-closed,[data-face=yawn] .m-open{visibility:visible}
+.e-open{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
+.sleepy .e-open{animation:sleepyBlink 3s infinite}
+.m-open{transform-box:fill-box;transform-origin:center}
+.eating .m-open{animation:chew .35s ease-in-out infinite}
+.ear-l,.ear-r,.tail{transform-box:fill-box;transform-origin:50% 90%}
+.tail{transform-origin:10% 80%}
+.happyst .tail{animation:wag .45s ease-in-out infinite alternate}
+.wig .ear-l{animation:earL .3s ease-in-out 4}.wig .ear-r{animation:earR .3s ease-in-out 4}
+.pet-body.walk,#petBody.walk{animation:waddle .5s ease-in-out infinite}
+#petBody.jump{animation:jump .65s ease-out 1}
+#petBody.spin{animation:spin .9s ease-in-out 1}
+#petBody.sit{animation:none;transform:scale(1.03,.88)}
+#petBody.lie{animation:snore 4s ease-in-out infinite;transform:translateY(6%) scale(1.04,.8)}
+#petBody.shake{animation:shake .28s linear infinite}
+#petBody.hug{animation:squish .5s ease-in-out 2}
+#petBody.slow{animation-duration:5.5s}
+.p{position:absolute;transform:translate(-50%,0);animation:rise 1.5s ease-out forwards;pointer-events:none;z-index:6;line-height:1;--dx:0px;--dy:-80px}
+.p.fall{animation:fall 1s ease-in forwards}
+.p.toss{animation:toss 2.4s ease-in-out forwards}
+.p.still{animation:still 2.6s ease-in-out forwards}
+.p.bub{animation:rise 1.8s ease-out forwards}
+#fxLayer,#evLayer{position:absolute;inset:0;pointer-events:none}
+#evLayer{z-index:7}
+.ev{position:absolute;pointer-events:auto;font-size:30px;line-height:1;padding:8px;cursor:pointer}
+.ev.butterfly{animation:fly 9s linear forwards}
+.ev.star{animation:shoot 3.2s linear forwards;font-size:26px}
+.ev.gift{animation:giftpop .6s ease-out,floaty 1.8s ease-in-out .6s infinite}
+#bubble{position:absolute;left:50%;top:3%;transform:translate(-50%,-10px) scale(.95);max-width:88%;padding:10px 14px;background:rgba(255,255,255,.94);border-radius:18px;box-shadow:var(--shadow);font-size:14px;line-height:1.35;font-weight:700;text-align:center;opacity:0;transition:.25s;pointer-events:none;z-index:8}
+#bubble.show{opacity:1;transform:translate(-50%,0) scale(1)}
+#bubble:after{content:"";position:absolute;left:50%;bottom:-7px;width:14px;height:14px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:3px}
+#letterBtn{position:absolute;right:10px;top:22%;font-size:34px;z-index:9;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:var(--shadow);animation:floaty 1.6s ease-in-out infinite}
+#actions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.act{background:var(--card);border-radius:20px;padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:62px;box-shadow:0 6px 16px rgba(160,120,170,.18);font-size:11px;font-weight:800;transition:transform .12s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.act span{font-size:26px;line-height:1.1}
+.act:active,.more:active,.btn:active,.buy:active{transform:scale(.93)}
+#more{display:flex;gap:8px}
+.more{position:relative;flex:1;height:46px;border-radius:23px;background:var(--card);font-weight:800;box-shadow:0 6px 16px rgba(160,120,170,.15);font-size:14px}
+.more.sos{flex:1.6;background:linear-gradient(135deg,#ffd7e5,#e6d8ff)}
+.badge{position:absolute;top:-4px;right:6px;min-width:20px;height:20px;border-radius:10px;background:#ff6f9a;color:#fff;font-size:12px;display:grid;place-items:center;padding:0 5px}
+#sleepOv{position:fixed;inset:0;z-index:50;background:rgba(12,10,48,.62);opacity:0;pointer-events:none;transition:opacity 3.5s}
+#sleepOv.on{opacity:1}
+#sleepOv .moon{position:absolute;right:12%;top:9%;font-size:64px;filter:drop-shadow(0 0 20px rgba(255,240,180,.8))}
+#sleepOv .star{position:absolute;color:#fff6c9;animation:twinkle 2.6s ease-in-out infinite}
+#wakeBtn{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);z-index:55;background:#fff;border-radius:26px;height:52px;padding:0 26px;font-weight:800;font-size:16px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.5s}
+#wakeBtn.on{opacity:1;pointer-events:auto;transform:translateX(-50%)}
+#sheet{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;background:rgba(80,50,90,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#sheet.open{display:flex}
+.panel{position:relative;width:100%;max-width:520px;max-height:88vh;max-height:88dvh;overflow:auto;background:#fffaf5;border-radius:28px 28px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));animation:up .28s ease-out;-webkit-overflow-scrolling:touch}
+.panel.full{height:100vh;height:100dvh;max-height:none;border-radius:0;display:flex;flex-direction:column}
+.panel h2{font-size:22px;margin-bottom:10px;text-align:center}
+.panel p{line-height:1.45;color:var(--ink2);text-align:center}
+.x{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:50%;background:rgba(150,110,170,.12);font-size:18px;z-index:2}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:50px;padding:0 24px;border-radius:25px;background:linear-gradient(135deg,#ff9ec1,#cdb4ff);color:#fff;font-weight:800;font-size:16px;box-shadow:0 8px 18px rgba(200,130,190,.35);transition:transform .12s}
+.btn.ghost{background:rgba(150,110,170,.14);color:var(--ink);box-shadow:none}
+.btn.big{height:58px;font-size:18px;padding:0 40px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin:0 -4px;-webkit-overflow-scrolling:touch}
+.tab{flex:0 0 auto;height:40px;padding:0 14px;border-radius:20px;background:rgba(150,110,170,.12);font-weight:800;font-size:14px}
+.tab.on{background:linear-gradient(135deg,#ff9ec1,#cdb4ff);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:#fff;border-radius:20px;padding:12px 10px;text-align:center;box-shadow:0 4px 14px rgba(160,120,170,.14);display:flex;flex-direction:column;align-items:center;gap:4px}
+.item.on{outline:2px solid #ffb3cf}
+.item .ic{font-size:38px;line-height:1.2}
+.item small{color:var(--ink2);font-size:12px;line-height:1.25;min-height:30px}
+.buy{margin-top:4px;height:42px;min-width:100px;padding:0 14px;border-radius:21px;background:#ffe3ee;font-weight:800}
+.buy.ok{background:#e6f6e9}.buy.poor{opacity:.55}
+.tag{margin-top:4px;height:42px;display:grid;place-items:center;font-weight:800;color:#6fb08b}
+.task{display:flex;align-items:center;gap:10px;background:#fff;border-radius:18px;padding:10px 12px;margin-bottom:8px;box-shadow:0 4px 12px rgba(160,120,170,.12)}
+.task .ti{font-size:26px}.task .tt{flex:1;font-weight:700;font-size:14px}
+.task .pg{height:6px;border-radius:4px;background:rgba(150,110,170,.18);margin-top:6px;overflow:hidden}
+.task .pg i{display:block;height:100%;background:linear-gradient(90deg,#ff9ec1,#cdb4ff)}
+.task .buy{min-width:84px;margin:0}
+.set{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:18px;padding:12px 14px;margin-bottom:8px;font-weight:700;gap:10px}
+.set input{flex:1;min-width:0;height:40px;border:2px solid #f2d9e6;border-radius:14px;padding:0 12px;font:inherit;color:var(--ink);background:#fffafc;-webkit-user-select:text;user-select:text}
+.sw{width:56px;height:32px;border-radius:16px;background:#ddd0e8;position:relative;transition:.2s;flex:0 0 auto}
+.sw:after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:#ff9ec1}.sw.on:after{left:27px}
+.letter{background:#fff;border-radius:20px;padding:22px 18px;box-shadow:0 8px 24px rgba(160,120,170,.2);margin:6px 0;font-size:17px;line-height:1.55;color:var(--ink);font-weight:700;text-align:center;animation:letterIn .7s ease-out}
+.env{font-size:56px;text-align:center;animation:floaty 2s ease-in-out infinite}
+.gm{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;flex:1;text-align:center;padding:20px}
+.gm .best{font-weight:800;color:#e0709a}
+.ghead{display:flex;justify-content:space-between;align-items:center;padding:6px 52px 10px 4px;font-size:18px;font-weight:800}
+#gArea{position:relative;flex:1;background:linear-gradient(180deg,#fff0f6,#efe6ff);border-radius:24px;overflow:hidden;touch-action:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.7)}
+.tg{position:absolute;width:62px;height:62px;border-radius:50%;font-size:36px;display:grid;place-items:center;background:rgba(255,255,255,.7);box-shadow:0 6px 16px rgba(220,120,160,.3);animation:tgin 1.7s linear forwards;touch-action:none}
+.tg.gold{background:#fff1b8}.tg.cloud{background:#e8eef8}
+.tg.pop{animation:tgpop .2s ease-out forwards}
+.gpop{position:absolute;font-weight:800;font-size:22px;color:#e0709a;animation:rise .8s ease-out forwards;pointer-events:none;--dx:0px;--dy:-40px}
+#care{position:fixed;inset:0;z-index:70;display:none;overflow:auto;background:linear-gradient(180deg,#fdf0ff,#fff4ec 60%,#e8f1ff)}
+#care.open{display:block;animation:fade .7s}
+.care-in{position:relative;max-width:520px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));text-align:center}
+.care-pet{position:relative;width:190px;margin:26px auto 4px;animation:calmB 5s ease-in-out infinite}
+.care-msg{font-size:19px;font-weight:800;margin:10px 0 16px;line-height:1.4}
+.card{background:rgba(255,255,255,.8);border-radius:24px;padding:18px 16px;box-shadow:var(--shadow);margin-bottom:14px;text-align:left}
+.card h3{font-size:18px;text-align:center}
+.tip{display:flex;gap:10px;align-items:flex-start;padding:10px 6px;border-radius:14px;line-height:1.4;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.tip i{font-style:normal;font-size:22px}
+.tip.done{opacity:.5;text-decoration:line-through}
+.tip.done:after{content:"✓";margin-left:auto;color:#6fb08b;font-weight:800}
+.warn{margin-top:10px;padding:12px;border-radius:16px;background:#fff1e0;font-size:14px;line-height:1.45;font-weight:600}
+.breath{width:140px;height:140px;margin:10px auto;border-radius:50%;background:radial-gradient(circle,#fff,#ffd3e4 60%,#e0d2ff);display:grid;place-items:center;font-weight:800;animation:breath 10s ease-in-out infinite;box-shadow:0 0 40px rgba(255,170,200,.6)}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-80px);z-index:100;background:#fff;border-radius:20px;padding:10px 18px;font-weight:800;font-size:14px;box-shadow:var(--shadow);transition:.35s;max-width:90%;text-align:center;pointer-events:none}
+#toast.show{transform:translate(-50%,0)}
+#onboard{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#fff4ec,#ffe3ee 55%,#e9dcff);overflow:auto}
+.ob{max-width:440px;width:100%;text-align:center}
+.ob h1{font-size:26px;margin:0 0 8px}
+.ob p{color:var(--ink2);line-height:1.5;margin:0 0 18px}
+.choose{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.pc{background:var(--card);border-radius:22px;padding:10px 4px 12px;box-shadow:var(--shadow);border:3px solid transparent;font-weight:800;transition:.2s}
+.pc.on{border-color:#ff9ec1;transform:translateY(-4px);background:#fff}
+.pc .pv{width:80%;margin:0 auto 4px;display:block}
+.pc .pv .pet-svg{animation:floaty 3s ease-in-out infinite}
+.ob input{width:100%;height:56px;border-radius:20px;border:3px solid #f2d9e6;font:inherit;font-size:20px;font-weight:800;text-align:center;color:var(--ink);background:#fff;margin-bottom:12px;-webkit-user-select:text;user-select:text}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.chip{height:40px;padding:0 14px;border-radius:20px;background:rgba(255,255,255,.8);font-weight:800}
+.ob .big-pet{width:150px;margin:0 auto 10px}
+.coin-s{display:inline-block}
+@keyframes pulse{50%{transform:scale(1.04)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.975)}}
+@keyframes snore{0%,100%{transform:translateY(6%) scale(1.04,.8)}50%{transform:translateY(6%) scale(1.05,.83)}}
+@keyframes waddle{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes jump{0%,100%{transform:translateY(0)}40%,60%{transform:translateY(-34px) scale(.97,1.04)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes squish{50%{transform:scale(1.07,.93)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes sleepyBlink{0%,100%{transform:scaleY(.4)}40%{transform:scaleY(.15)}60%{transform:scaleY(.5)}}
+@keyframes chew{50%{transform:scaleY(.45)}}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@keyframes earL{50%{transform:rotate(-10deg)}}
+@keyframes earR{50%{transform:rotate(10deg)}}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,0) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),var(--dy)) scale(1.1)}}
+@keyframes fall{0%{opacity:0;transform:translate(-50%,0)}20%{opacity:1}100%{opacity:1;transform:translate(-50%,var(--dy))}}
+@keyframes toss{0%{opacity:0;transform:translate(-50%,0)}10%{opacity:1}30%{transform:translate(-30px,-70px)}50%{transform:translate(-10px,0)}70%{transform:translate(20px,-40px)}90%{transform:translate(40px,0);opacity:1}100%{transform:translate(50px,0);opacity:0}}
+@keyframes still{0%{opacity:0}20%,80%{opacity:1}100%{opacity:0}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#thought.on{animation:thoughtf 2s ease-in-out infinite}
+@keyframes thoughtf{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes drift{from{transform:translateX(-14px)}to{transform:translateX(14px)}}
+@keyframes ballb{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+@keyframes fly{0%{left:-8%;top:40%;opacity:0}10%{opacity:1}25%{top:25%}50%{top:48%}75%{top:30%}100%{left:105%;top:42%;opacity:1}}
+@keyframes shoot{0%{left:90%;top:4%;opacity:0}10%{opacity:1}100%{left:5%;top:34%;opacity:0}}
+@keyframes giftpop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes up{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes letterIn{from{transform:translateY(20px) scale(.95);opacity:0}to{transform:none;opacity:1}}
+@keyframes tgin{0%{transform:scale(.3);opacity:0}12%{transform:scale(1);opacity:1}85%{opacity:1}100%{transform:scale(.8);opacity:0}}
+@keyframes tgpop{to{transform:scale(1.5);opacity:0}}
+@keyframes calmB{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes breath{0%{transform:scale(.7)}40%{transform:scale(1.15)}100%{transform:scale(.7)}}
+
+#bathSvg{position:absolute;inset:0;width:100%;height:100%;display:none}
+#room.bath #roomSvg{display:none}
+#room.bath #bathSvg{display:block}
+.bath #petBody{touch-action:none}
+#foam{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s}
+#foam span{position:absolute;font-size:22px;line-height:1}
+#tray{position:absolute;left:0;right:0;bottom:0;z-index:9;padding:8px 10px 12px;background:linear-gradient(0deg,rgba(255,250,245,.97),rgba(255,250,245,.8));border-radius:22px 22px 0 0;text-align:center;animation:up .3s ease-out}
+.thint{font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:6px}
+.trow{display:flex;gap:8px;justify-content:center;align-items:center}
+.food-i{position:relative;width:64px;height:64px;border-radius:20px;background:#fff;box-shadow:var(--shadow);font-size:32px;line-height:1;display:grid;place-items:center;padding-bottom:10px;touch-action:none}
+.food-i small{position:absolute;bottom:4px;left:0;right:0;font-size:10px;font-weight:800;color:var(--ink2)}
+#drag{position:fixed;z-index:200;font-size:46px;line-height:1;pointer-events:none;transform:translate(-50%,-70%);filter:drop-shadow(0 6px 8px rgba(120,80,120,.3))}
+#bathUI{position:absolute;left:0;right:0;bottom:0;z-index:9;padding:8px 12px 12px;text-align:center;pointer-events:none}
+#bathUI>*{pointer-events:auto}
+#bathHint{font-size:13px;font-weight:800;margin-bottom:6px;color:#4f7d93;text-shadow:0 1px 0 #fff;pointer-events:none}
+.bprog{height:10px;border-radius:6px;background:rgba(255,255,255,.75);overflow:hidden;margin:0 auto 8px;max-width:260px}
+.bprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8fd3f4,#b7a6ff);transition:width .2s}
+.brow{display:flex;gap:10px;justify-content:center}
+.bbtn{height:44px;padding:0 18px;border-radius:22px;background:linear-gradient(135deg,#8fd3f4,#b7a6ff);color:#fff;font-weight:800;font-size:14px;box-shadow:var(--shadow);transition:transform .12s}
+.bbtn.ghost{background:rgba(255,255,255,.9);color:var(--ink)}
+.bbtn:disabled{opacity:.45}
+.bbtn:active{transform:scale(.94)}
+.inbath #actions{opacity:.45;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.cloud,.bulb{animation:none}}
+@media (min-width:700px){#app{padding-top:16px}}
+</style>
+</head>
+<body>
+
+<div id="app" hidden>
+  <header id="top">
+    <div class="who"><span id="todIco">☀️</span><b id="petName">…</b></div>
+    <div class="right">
+      <button id="coinBtn" class="pill" aria-label="Лапки">🐾 <span id="coins">0</span></button>
+      <button id="gearBtn" class="round" data-act="settings" aria-label="Настройки">⚙️</button>
+    </div>
+  </header>
+  <div id="stats"></div>
+  <div id="roomWrap">
+    <div id="room" class="tod-day">
+      <svg id="roomSvg" viewBox="0 0 360 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop class="sk1" offset="0"/><stop class="sk2" offset="1"/></linearGradient>
+          <radialGradient id="glowG"><stop offset="0" stop-color="#ffe9a0" stop-opacity=".85"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></radialGradient>
+          <pattern id="pHearts" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#ffe3ec"/><text x="8" y="26" font-size="16" fill="#ffbcd0">♥</text></pattern>
+          <pattern id="pStars" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#cfc2f0"/><text x="10" y="26" font-size="14" fill="#fff3d0">✦</text></pattern>
+        </defs>
+        <rect class="wall-base" width="360" height="252"/>
+        <rect id="it-wall1" width="360" height="252" fill="url(#pHearts)"/>
+        <rect id="it-wall2" width="360" height="252" fill="url(#pStars)"/>
+        <rect y="244" width="360" height="10" fill="rgba(255,255,255,.55)"/>
+        <rect class="floor" y="252" width="360" height="148"/>
+        <path d="M0 292H360M0 332H360M0 372H360" stroke="rgba(120,80,60,.08)" stroke-width="2"/>
+        <!-- окно -->
+        <g data-hit="window" transform="translate(125,36)">
+          <path d="M-8 -4 Q9 40 -6 112 L-14 112 L-14 -4Z" fill="#ffc8dd"/>
+          <path d="M118 -4 Q101 40 116 112 L124 112 L124 -4Z" fill="#ffc8dd"/>
+          <rect width="110" height="96" rx="12" fill="#fff"/>
+          <rect x="6" y="6" width="98" height="84" rx="8" fill="url(#sky)"/>
+          <circle class="wstar" cx="22" cy="20" r="1.6" fill="#fff"/><circle class="wstar" cx="40" cy="14" r="1.2" fill="#fff"/><circle class="wstar" cx="60" cy="26" r="1.6" fill="#fff"/><circle class="wstar" cx="88" cy="14" r="1.3" fill="#fff"/><circle class="wstar" cx="30" cy="48" r="1.2" fill="#fff"/><circle class="wstar" cx="92" cy="50" r="1.5" fill="#fff"/>
+          <circle class="sun" cx="78" cy="30" r="12" fill="#ffe9a8"/>
+          <text class="moonw" x="62" y="42" font-size="26">🌙</text>
+          <g class="cloud" fill="#fff" opacity=".85"><ellipse cx="34" cy="42" rx="14" ry="6"/><ellipse cx="44" cy="38" rx="10" ry="6"/></g>
+          <path d="M55 6V90M6 48H104" stroke="#fff" stroke-width="4"/>
+          <rect x="-6" y="92" width="122" height="8" rx="4" fill="#f1ddc8"/>
+        </g>
+        <!-- рамка -->
+        <g id="it-frame" data-hit="frame" transform="translate(36,70)"><rect width="62" height="76" rx="6" fill="#f5d9b5"/><rect x="6" y="6" width="50" height="64" rx="3" fill="#fff4f8"/><text x="31" y="48" font-size="26" text-anchor="middle">🐾</text></g>
+        <!-- полка и лампы -->
+        <rect x="252" y="152" width="92" height="8" rx="4" fill="#e9c9a6"/>
+        <g id="it-lamp1" data-hit="lamp" transform="translate(290,152)"><rect x="-7" y="-12" width="14" height="12" rx="3" fill="#e8d4ff"/><path d="M-16 -12 L16 -12 L9 -38 L-9 -38Z" fill="#ffe27a"/><text x="-7" y="-17" font-size="13">⭐</text></g>
+        <g id="it-lamp2" data-hit="lamp" transform="translate(290,152)"><rect x="-5" y="-16" width="10" height="16" rx="3" fill="#fff0e0"/><path d="M-20 -16 Q0 -48 20 -16Z" fill="#ff8fa3"/><circle cx="-7" cy="-24" r="3" fill="#fff"/><circle cx="6" cy="-29" r="3" fill="#fff"/></g>
+        <!-- ковёр -->
+        <g id="it-rug" data-hit="rug"><ellipse cx="180" cy="338" rx="118" ry="30" fill="#ffd6e6"/><ellipse cx="180" cy="338" rx="94" ry="22" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 6"/></g>
+        <!-- кровати -->
+        <g id="it-bed0" transform="translate(12,270)"><rect x="0" y="22" width="120" height="42" rx="14" fill="#c9a77f"/><rect x="6" y="10" width="108" height="34" rx="14" fill="#fff0f4"/><rect x="10" y="4" width="36" height="22" rx="11" fill="#fff"/></g>
+        <g id="it-bed1" transform="translate(12,270)"><rect x="0" y="24" width="120" height="40" rx="18" fill="#cfe0ff"/><circle cx="24" cy="22" r="20" fill="#eaf2ff"/><circle cx="56" cy="14" r="24" fill="#f4f8ff"/><circle cx="92" cy="22" r="20" fill="#eaf2ff"/><rect x="14" y="26" width="92" height="26" rx="13" fill="#fff"/></g>
+        <g id="it-bed2" transform="translate(12,270)"><rect x="0" y="22" width="120" height="42" rx="16" fill="#6d5bb8"/><rect x="6" y="10" width="108" height="34" rx="16" fill="#9b88e0"/><rect x="10" y="4" width="36" height="22" rx="11" fill="#cfc2f5"/><text x="82" y="34" font-size="20">🌙</text><text x="62" y="26" font-size="9" fill="#fff6c9">✦</text></g>
+        <!-- растения -->
+        <g id="it-monstera" data-hit="plant" transform="translate(258,266)"><path d="M2 54 H44 L38 80 H8Z" fill="#d89b7c"/><ellipse cx="14" cy="30" rx="11" ry="24" transform="rotate(-28 14 30)" fill="#5fae85"/><ellipse cx="32" cy="26" rx="11" ry="25" transform="rotate(26 32 26)" fill="#6fbf94"/><ellipse cx="23" cy="20" rx="10" ry="26" fill="#4f9d76"/></g>
+        <g id="it-tulip" data-hit="plant" transform="translate(320,292)"><path d="M0 26 H32 L28 50 H4Z" fill="#e6a38a"/><path d="M16 26 V6" stroke="#6fb08b" stroke-width="3"/><path d="M16 20 Q4 16 2 6 Q14 10 16 20" fill="#8cc9a5"/><path d="M8 8 Q16 -10 24 8 Q16 16 8 8Z" fill="#ff7fa5"/></g>
+        <!-- миска -->
+        <g data-hit="bowl" transform="translate(268,344)"><path d="M0 10 H60 Q56 34 30 34 Q4 34 0 10Z" fill="#ff9ec1"/><ellipse cx="30" cy="10" rx="30" ry="7" fill="#ffc1d6"/><g id="food" style="opacity:0;transition:opacity .6s"><ellipse cx="30" cy="9" rx="22" ry="5" fill="#b9814f"/><circle cx="20" cy="5" r="3" fill="#a06a3c"/><circle cx="31" cy="3" r="3" fill="#c08a58"/><circle cx="41" cy="6" r="3" fill="#a06a3c"/></g></g>
+        <!-- игрушки -->
+        <g id="it-teddy" data-hit="teddy" transform="translate(138,338)"><g class="teddyin"><circle cx="16" cy="22" r="14" fill="#d9a77c"/><circle cx="16" cy="6" r="11" fill="#d9a77c"/><circle cx="8" cy="-2" r="4.5" fill="#d9a77c"/><circle cx="24" cy="-2" r="4.5" fill="#d9a77c"/><circle cx="12.5" cy="5" r="1.4" fill="#4a3b4f"/><circle cx="19.5" cy="5" r="1.4" fill="#4a3b4f"/><ellipse cx="16" cy="9.5" rx="3.6" ry="2.6" fill="#f6dcc0"/></g></g>
+        <g id="it-ball" data-hit="ball" transform="translate(206,352)"><g class="ballin"><circle cx="12" cy="12" r="12" fill="#7ec8e3"/><path d="M1 8 Q12 15 23 8M1 17 Q12 10 23 17" stroke="#fff" stroke-width="2.2" fill="none"/></g></g>
+        <!-- затемнение по времени суток -->
+        <rect class="tint" width="360" height="400"/>
+        <circle class="glow" id="glow-lamp1" cx="290" cy="130" r="84" fill="url(#glowG)"/>
+        <circle class="glow" id="glow-lamp2" cx="290" cy="130" r="84" fill="url(#glowG)"/>
+        <g id="it-garland"><path id="garPath" d="M-4 12 Q90 52 180 18 T364 14" stroke="#b79a8a" stroke-width="2" fill="none"/><g id="bulbs"></g></g>
+      </svg>
+      <svg id="bathSvg" viewBox="0 0 360 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="tiles" width="36" height="36" patternUnits="userSpaceOnUse"><rect width="36" height="36" fill="#e4f3fb"/><path d="M0 0H36M0 0V36" fill="none" stroke="#fff" stroke-width="2.5"/></pattern></defs>
+        <rect width="360" height="268" fill="url(#tiles)"/>
+        <rect y="262" width="360" height="12" fill="#fff" opacity=".8"/>
+        <rect y="268" width="360" height="132" fill="#cfe6ef"/>
+        <path d="M0 308H360M0 348H360" stroke="rgba(80,120,140,.12)" stroke-width="2"/>
+        <rect x="171" y="0" width="8" height="64" fill="#b8c7d6"/>
+        <path d="M142 64 H208 L194 84 H156Z" fill="#9fb3c8"/>
+        <g fill="#6f8aa3"><circle cx="160" cy="78" r="1.8"/><circle cx="170" cy="79" r="1.8"/><circle cx="180" cy="79" r="1.8"/><circle cx="190" cy="78" r="1.8"/></g>
+        <rect x="26" y="66" width="70" height="7" rx="3" fill="#b8c7d6"/>
+        <path d="M36 73 H88 V150 Q62 160 36 150Z" fill="#ffc8dd"/><path d="M36 100 H88M36 124 H88" stroke="#fff" stroke-width="3"/>
+        <g transform="translate(236,176)"><rect x="-4" y="28" width="148" height="16" rx="8" fill="#f4fbff"/><rect x="0" y="34" width="140" height="70" rx="28" fill="#fff"/><path d="M12 52 H128 Q124 88 70 90 Q16 88 12 52Z" fill="#bfe7ff" opacity=".85"/><circle cx="22" cy="106" r="7" fill="#d5dde6"/><circle cx="118" cy="106" r="7" fill="#d5dde6"/><text x="52" y="56" font-size="30">🦆</text><text x="92" y="48" font-size="16">🫧</text></g>
+        <rect x="262" y="132" width="82" height="7" rx="3" fill="#b8c7d6"/>
+        <rect x="270" y="112" width="14" height="20" rx="4" fill="#ffb3cf"/><rect x="290" y="106" width="14" height="26" rx="4" fill="#b7a6ff"/><rect x="310" y="116" width="14" height="16" rx="4" fill="#8fd3f4"/>
+        <ellipse cx="150" cy="298" rx="100" ry="22" fill="#ffd6e6"/><ellipse cx="150" cy="298" rx="78" ry="15" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 6"/>
+      </svg>
+      <div id="pet" style="left:30%;bottom:5%"><div id="thought"></div><div id="petBody"></div><div id="foam"></div></div>
+      <div id="fxLayer"></div>
+      <div id="evLayer"></div>
+      <div id="bubble"></div>
+      <button id="letterBtn" data-act="letter" hidden aria-label="Письмо">💌</button>
+      <div id="tray" hidden></div>
+      <div id="bathUI" hidden><div id="bathHint"></div><div class="bprog"><i></i></div><div class="brow"><button class="bbtn" data-act="bath-rinse" disabled>🚿 Смыть</button><button class="bbtn ghost" data-act="bath-out">← Выйти</button></div></div>
+    </div>
+  </div>
+  <nav id="actions">
+    <button class="act" data-act="feed"><span>🍖</span>Кормить</button>
+    <button class="act" data-act="pet"><span>🫳</span>Гладить</button>
+    <button class="act" data-act="play"><span>🎾</span>Играть</button>
+    <button class="act" data-act="wash"><span>🛁</span>Мыть</button>
+    <button class="act" data-act="sleep"><span>💤</span>Спать</button>
+  </nav>
+  <div id="more">
+    <button class="more" data-act="game">🎮 Игра</button>
+    <button class="more" data-act="shop">🛍️ Магазин</button>
+    <button class="more" data-act="tasks" aria-label="Задания">📋 Дела<span class="badge" id="taskBadge" hidden>0</span></button>
+    <button class="more sos" data-act="care">Мне плохо 🥺</button>
+  </div>
+</div>
+
+<div id="onboard" hidden></div>
+<div id="sleepOv"><div class="moon">🌙</div></div>
+<button id="wakeBtn" data-act="wake">☀️ Разбудить</button>
+<div id="sheet"></div>
+<div id="care"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= 0. УТИЛИТЫ ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dayKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+
+/* ================= 1. СОСТОЯНИЕ ИГРЫ ================= */
+const KEY='ayauPetV1';
+const PETS={
+  dog:{label:'Собачка',emoji:'🐶',body:'#f1d3ac',belly:'#fff1de',ear:'#c99763'},
+  cat:{label:'Котёнок',emoji:'🐱',body:'#cfc3df',belly:'#f4eefb',ear:'#a99bc2'},
+  rabbit:{label:'Зайчик',emoji:'🐰',body:'#fffaf6',belly:'#ffffff',ear:'#f7d9e3'}
+};
+function defaults(){return{v:1,pet:null,name:'',stats:{mood:80,food:80,energy:90,clean:90},coins:20,
+  owned:{bed0:1,wall0:1},placed:{bed0:1,wall0:1},best:0,games:0,created:Date.now(),lastSeen:Date.now(),
+  lastDay:'',streak:0,days:0,tasks:{date:'',c:{},claimed:{}},letters:{read:[],last:0,count:0,pending:null},
+  secrets:{},sound:false,sleeping:false,lastAuto:0};}
+let S=defaults();
+
+/* ================= 2. СОХРАНЕНИЕ / ЗАГРУЗКА ================= */
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw) return;
+    const p=JSON.parse(raw), base=defaults();
+    S=Object.assign(defaults(),p);
+    S.stats=Object.assign(base.stats,p.stats||{});
+    S.owned=Object.assign({bed0:1,wall0:1},p.owned||{});
+    S.placed=Object.assign({bed0:1,wall0:1},p.placed||{});
+    S.tasks=Object.assign({date:'',c:{},claimed:{}},p.tasks||{});
+    S.letters=Object.assign({read:[],last:0,count:0,pending:null},p.letters||{});
+    S.secrets=p.secrets||{};
+    if(!PETS[S.pet]) S.pet=null;
+  }catch(e){}
+}
+function save(){
+  S.lastSeen=Date.now();
+  try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+}
+function applyOffline(){
+  const away=(Date.now()-S.lastSeen)/3600000;
+  if(away<0.02) return away;
+  const h=Math.min(away,10), k=0.6, st=S.stats;
+  const floorv=(v,f)=>Math.max(Math.min(v,f),v);
+  if(S.sleeping){
+    st.energy=clamp(st.energy+h*60);
+    st.food=clamp(st.food-6*h*k);
+    S.sleeping=false;
+  }else{
+    st.food=Math.max(Math.min(st.food,12),st.food-18*h*k);
+    st.energy=Math.max(Math.min(st.energy,12),st.energy-12*h*k);
+    st.clean=Math.max(Math.min(st.clean,15),st.clean-10*h*k);
+    st.mood=Math.max(Math.min(st.mood,15),st.mood-14*h*k);
+  }
+  return away;
+}
+
+/* ================= ЗВУК / ТОСТ ================= */
+let AC=null;
+function sfx(k){
+  if(!S.sound) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended') AC.resume();
+    const seq={tap:[[660,.08]],coin:[[880,.07],[1320,.1]],eat:[[300,.06],[360,.06],[330,.06]],ok:[[523,.08],[659,.08],[784,.12]],bad:[[220,.15]]}[k]||[];
+    let at=AC.currentTime;
+    seq.forEach(([f,d])=>{
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,at);g.gain.exponentialRampToValueAtTime(.06,at+.01);g.gain.exponentialRampToValueAtTime(.0001,at+d);
+      o.connect(g);g.connect(AC.destination);o.start(at);o.stop(at+d+.02);at+=d*.9;
+    });
+  }catch(e){}
+}
+let toastT;
+function toast(msg,ms=2200){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+/* ================= 8. СООБЩЕНИЯ ================= */
+const MSG={
+  chat:['Аяу, ты сегодня покушала? 🥺','Мне кажется, тебе пора немного отдохнуть.','Я скучал!','Пойдём играть?','Ты сегодня выглядишь счастливой. Мне нравится.','Не забудь попить воды 💧','Потянись немножко! Вот так… 🙆','Расскажешь, как прошёл твой день?','Я просто посижу рядом, ладно?','Ты у меня молодец. Я это вижу.','Если устала — приляг на минутку.','Хочешь секрет? Тыкай во всё подряд 👀'],
+  own:{dog:['Гав! 🐾','*виляет хвостиком*','Хочу гулять! …хотя тут и так уютно.'],cat:['Мур-мур 😸','*щурится и мурлычет*','Я тут главный. Шучу. Ну почти.'],rabbit:['*морщит носик*','*тихонько хрустит морковкой*','Тук-тук лапкой!']},
+  thoughts:['Интересно, что там за окном?','Ой, пылинка! …нет, показалось 👀','Хочу печеньку. Нет, просто хочу ☺️','Тут так уютно ✨','А вдруг в комнате есть секреты?'],
+  morning:['Доброе утро! Как спалось? ☀️','Утро! Давай начнём день с чего-то хорошего.','Мне снился вкусный сон 🍗'],
+  day:['Какой день! Хочется играть 🌤️','Днём в комнате так светло!','Поиграем? Я уже наготове!'],
+  evening:['Вечереет… Я немножко сонный 🌆','Какой красивый закат за окном!','Вечером особенно уютно.'],
+  night:['Ночью уютно. Но тебе пора спать, Аяу 🌙','Звёздочки за окном! ✨','Пора потихоньку отдыхать… 🌙'],
+  hungry:['Животик урчит… покормишь? 🍗','Аяу, мне бы немножко кушать 🥺','Миска пустая… и я тоже 😢'],
+  sleepy:['*зевает* Хочу спать… 💤','Глазки слипаются…','Может, прилечь на минутку?'],
+  dirty:['Я немножко грязненький… 🫧','Хочу купаться!','Пузырики были бы кстати 🛁'],
+  sad:['Мне чуть-чуть грустно. Погладишь? 🥺','Побудь со мной немножко…','Обними меня, пожалуйста 🤍'],
+  feed:['Ням-ням! Вкусно! 😋','Спасибо! Ты лучшая 🍗','Это было очень вкусно!'],
+  full:['Я больше не могу… 🥴','Я сыт! Честно-честно.','Животик круглый, как мячик!'],
+  pet:['Мррр… приятно 🥰','Ещё, пожалуйста…','Мне так хорошо 🤍','Ты добрая.'],
+  play:['Ура, играем! 🎾','Лови меня!','Давай ещё!'],
+  tired:['Я устал… давай потом? 😴','Сил совсем нет… 💤'],
+  wash:['Бр-р, мокро! Зато чисто ✨','Пузырики! 🫧','Я пахну облачком!'],
+  window:['Смотрю в окно… 🪟','Там небо. Оно красивое.','Интересно, кто там летит?'],
+  back:['Ты вернулась! Я скучал 🐾','Ура, ты пришла! Я тебя ждал!','Наконец-то! Пойдём играть?','Питомец ждал тебя 🐾']
+};
+const LETTERS=[
+  'Если тебе сегодня тяжело, просто помни, что рядом есть человек, который очень хочет тебя обнять.',
+  'Ты молодец, что дошла до этого дня. Правда.',
+  'Выпей воды и сделай глубокий вдох. Это маленькая забота от меня 🤍',
+  'Я горжусь тобой. Даже если ты сама этого сегодня не замечаешь.',
+  'Надеюсь, ты улыбнулась хотя бы раз сегодня. Если нет — потыкай питомца, он постарается.',
+  'Ты не обязана быть сильной каждую секунду.',
+  'Ты важна. Очень.',
+  'Если захочется поговорить — просто напиши мне.',
+  'Сегодня достаточно просто быть. Остальное подождёт.',
+  'Я сделал этого малыша, чтобы тебе было чуточку веселее. Надеюсь, получилось 🐾'
+];
+let lastSaid='',bubbleT;
+function say(text,ms=4200){
+  if(text===lastSaid&&Math.random()<.7) return;
+  lastSaid=text;
+  const b=$('#bubble'); b.textContent=text; b.classList.add('show');
+  clearTimeout(bubbleT); bubbleT=setTimeout(()=>b.classList.remove('show'),ms);
+}
+
+/* ================= 3. ПИТОМЕЦ ================= */
+function petSVG(type){
+  const P=PETS[type], c=P.body, e=P.ear;
+  const st=type==='rabbit'?' stroke="#f1e4ea" stroke-width="2"':'';
+  let back='',front='',nose='#4a3b4f';
+  if(type==='dog'){
+    back=`<g class="tail"><ellipse cx="146" cy="142" rx="8" ry="16" transform="rotate(35 146 142)" fill="${e}"/></g>
+    <g class="ear-l"><ellipse cx="57" cy="78" rx="16" ry="30" transform="rotate(16 57 78)" fill="${e}"/></g>
+    <g class="ear-r"><ellipse cx="143" cy="78" rx="16" ry="30" transform="rotate(-16 143 78)" fill="${e}"/></g>`;
+    front=`<ellipse cx="100" cy="103" rx="24" ry="18" fill="#fff6ea"/><ellipse cx="73" cy="80" rx="13" ry="15" fill="${e}" opacity=".7"/>`;
+  }else if(type==='cat'){
+    nose='#f4a1b5';
+    back=`<path class="tail" d="M140 156 Q182 150 172 112" stroke="${e}" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <g class="ear-l"><polygon points="58,64 60,20 98,44" fill="${c}"/><polygon points="66,55 67,33 86,46" fill="#f9bfd0"/></g>
+    <g class="ear-r"><polygon points="142,64 140,20 102,44" fill="${c}"/><polygon points="134,55 133,33 114,46" fill="#f9bfd0"/></g>`;
+    front=`<g stroke="#8d7da3" stroke-width="1.6" stroke-linecap="round" opacity=".7"><path d="M62 98 L40 94M62 104 L40 106M138 98 L160 94M138 104 L160 106"/></g><path d="M96 52 L96 62M100 50 L100 62M104 52 L104 62" stroke="${e}" stroke-width="3" stroke-linecap="round"/>`;
+  }else{
+    nose='#ff9fb8';
+    back=`<circle class="tail" cx="146" cy="160" r="12" fill="#fff" stroke="#f1e4ea" stroke-width="2"/>
+    <g class="ear-l"><g transform="rotate(-8 80 24)"><ellipse cx="80" cy="22" rx="13" ry="38" fill="${c}" stroke="#f1e4ea" stroke-width="2"/><ellipse cx="80" cy="26" rx="6.5" ry="26" fill="#ffc9d8"/></g></g>
+    <g class="ear-r"><g transform="rotate(8 120 24)"><ellipse cx="120" cy="22" rx="13" ry="38" fill="${c}" stroke="#f1e4ea" stroke-width="2"/><ellipse cx="120" cy="26" rx="6.5" ry="26" fill="#ffc9d8"/></g></g>`;
+  }
+  return `<svg class="pet-svg" viewBox="0 -20 200 220" data-face="normal" xmlns="http://www.w3.org/2000/svg">
+  ${back}
+  <ellipse cx="100" cy="193" rx="52" ry="7" fill="rgba(90,60,100,.14)"/>
+  <ellipse cx="100" cy="150" rx="42" ry="34" fill="${c}"${st}/>
+  <ellipse cx="100" cy="157" rx="26" ry="22" fill="${P.belly}"/>
+  <ellipse cx="78" cy="182" rx="15" ry="9" fill="${c}"${st}/><ellipse cx="122" cy="182" rx="15" ry="9" fill="${c}"${st}/>
+  <g class="fx acc acc-scarf"><path d="M66 126 Q100 146 134 126 L136 140 Q100 160 64 140 Z" fill="#ff9aa2"/><rect x="118" y="136" width="14" height="30" rx="6" fill="#ff8791" transform="rotate(-8 125 136)"/></g>
+  <circle cx="100" cy="88" r="45" fill="${c}"${st}/>
+  ${front}
+  <ellipse cx="100" cy="97" rx="6" ry="4.5" fill="${nose}"/>
+  <circle cx="68" cy="101" r="8" fill="#ffa8be" opacity=".45"/><circle cx="132" cy="101" r="8" fill="#ffa8be" opacity=".45"/>
+  <g class="fx e-open"><circle cx="81" cy="86" r="6.5" fill="#3d2f45"/><circle cx="119" cy="86" r="6.5" fill="#3d2f45"/><circle cx="83" cy="83.5" r="2.2" fill="#fff"/><circle cx="121" cy="83.5" r="2.2" fill="#fff"/></g>
+  <g class="fx e-happy" fill="none" stroke="#3d2f45" stroke-width="4" stroke-linecap="round"><path d="M73 90 Q81 79 89 90"/><path d="M111 90 Q119 79 127 90"/></g>
+  <g class="fx e-closed" fill="none" stroke="#3d2f45" stroke-width="3.5" stroke-linecap="round"><path d="M74 86 Q81 92 88 86"/><path d="M112 86 Q119 92 126 86"/></g>
+  <g class="fx brow" stroke="#3d2f45" stroke-width="3" stroke-linecap="round"><path d="M72 72 L90 78"/><path d="M128 72 L110 78"/></g>
+  <path class="fx m-smile" d="M91 104 Q95.5 111 100 104 Q104.5 111 109 104" fill="none" stroke="#3d2f45" stroke-width="3" stroke-linecap="round"/>
+  <g class="fx m-big"><path d="M90 103 Q100 124 110 103 Z" fill="#e8707f" stroke="#3d2f45" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="113" rx="5" ry="3" fill="#ff9fb0"/></g>
+  <path class="fx m-sad" d="M92 111 Q100 102 108 111" fill="none" stroke="#3d2f45" stroke-width="3" stroke-linecap="round"/>
+  <ellipse class="fx m-open" cx="100" cy="111" rx="7" ry="8" fill="#e8707f" stroke="#3d2f45" stroke-width="2.5"/>
+  <path class="fx m-flat" d="M94 107 Q100 111 106 107" fill="none" stroke="#3d2f45" stroke-width="3" stroke-linecap="round"/>
+  <g class="fx acc acc-glasses" fill="rgba(255,255,255,.22)" stroke="#6b5a7a" stroke-width="3"><circle cx="81" cy="86" r="13"/><circle cx="119" cy="86" r="13"/><path d="M94 86 Q100 82 106 86" fill="none"/></g>
+  <g class="fx acc acc-hat" transform="rotate(-8 100 50)"><polygon points="78,54 122,54 100,4" fill="#b79cff"/><circle cx="95" cy="36" r="3" fill="#fff"/><circle cx="104" cy="24" r="3" fill="#ffd6e8"/><circle cx="108" cy="42" r="3" fill="#fff"/><circle cx="100" cy="4" r="6.5" fill="#ffd6e8"/></g>
+  <g class="fx acc acc-bow"><polygon points="136,56 116,44 116,68" fill="#ff8fab"/><polygon points="136,56 156,44 156,68" fill="#ff8fab"/><circle cx="136" cy="56" r="6.5" fill="#ff6f9a"/></g>
+  </svg>`;
+}
+function applyAcc(svg){
+  if(!svg) return;
+  ['bow','hat','glasses','scarf'].forEach(id=>{
+    const el=svg.querySelector('.acc-'+id);
+    if(el) el.style.visibility=S.placed[id]?'visible':'hidden';
+  });
+}
+const petBody=()=>$('#petBody');
+const mainSvg=()=>$('#petBody svg');
+let tFace=null,tFaceT;
+function faceFor(f,ms){tFace=f;clearTimeout(tFaceT);tFaceT=setTimeout(()=>{tFace=null;renderPetState();},ms);renderPetState();}
+function addStat(k,v){S.stats[k]=clamp(S.stats[k]+v);}
+function renderPetState(){
+  const svg=mainSvg(); if(!svg) return;
+  const st=S.stats; let face='normal';
+  if(S.sleeping) face='sleep';
+  else if(tFace) face=tFace;
+  else if(st.mood<30||st.food<18) face='sad';
+  svg.setAttribute('data-face',face);
+  svg.classList.toggle('happyst',!S.sleeping&&st.mood>65);
+  svg.classList.toggle('sleepy',!S.sleeping&&st.energy<25);
+  svg.classList.toggle('eating',face==='eat');
+  petBody().classList.toggle('slow',st.mood<30);
+  let th='';
+  if(!S.sleeping){
+    if(st.food<30) th='🍗'; else if(st.clean<25) th='🫧'; else if(st.energy<25) th='💤'; else if(st.mood<30) th='🥺';
+  }
+  const t=$('#thought'); t.textContent=th; t.classList.toggle('on',!!th);
+}
+
+/* ================= 4. КОМНАТА ================= */
+const SPOTS={bath:{l:27,b:27},feed:{l:31,b:28},bed:{l:0,b:19},left:{l:10,b:5},mid:{l:30,b:5},bowl:{l:60,b:5},toy:{l:36,b:4},window:{l:31,b:8},plant:{l:48,b:7}};
+let curSpot='mid',lastL=30;
+function setPetPos(name,instant){
+  const sp=SPOTS[name]||SPOTS.mid, el=$('#pet');
+  if(instant) el.style.transition='none';
+  el.style.left=sp.l+'%'; el.style.bottom=sp.b+'%'; curSpot=name; lastL=sp.l;
+  if(instant){void el.offsetWidth; el.style.transition='';}
+}
+function walkTo(name){
+  const sp=SPOTS[name]||SPOTS.mid, el=$('#pet');
+  const curL=parseFloat(el.style.left)||30, curB=parseFloat(el.style.bottom)||5;
+  const dist=Math.abs(sp.l-curL)+Math.abs(sp.b-curB)*.5;
+  const slow=S.stats.mood<30?1.7:1;
+  const dur=(dist<2?.2:(.5+dist/28))*slow;
+  el.style.transition=`left ${dur}s ease-in-out,bottom ${dur}s ease-in-out`;
+  el.style.left=sp.l+'%'; el.style.bottom=sp.b+'%';
+  const svg=mainSvg();
+  if(svg&&Math.abs(sp.l-curL)>2) svg.style.transform=sp.l<curL?'scaleX(-1)':'scaleX(1)';
+  curSpot=name; lastL=sp.l;
+  if(dist>=2){petBody().classList.add('walk');setTimeout(()=>petBody().classList.remove('walk'),dur*1000);}
+  return wait(dur*1000+60);
+}
+function headPos(){
+  const el=$('#pet');
+  const l=parseFloat(el.style.left)||30, b=parseFloat(el.style.bottom)||5;
+  return{x:l+19,y:81-b-8};
+}
+function fx(emoji,x,y,o={}){
+  const l=$('#fxLayer'), e=document.createElement('span');
+  e.className='p '+(o.cls||''); e.textContent=emoji;
+  e.style.left=x+'%'; e.style.top=y+'%';
+  e.style.setProperty('--dx',(o.dx!==undefined?o.dx:rnd(-30,30))+'px');
+  e.style.setProperty('--dy',(o.dy!==undefined?o.dy:-80)+'px');
+  e.style.fontSize=(o.size||22)+'px';
+  e.style.animationDuration=(o.dur||1.5)+'s';
+  e.style.animationDelay=(o.delay||0)+'s';
+  l.appendChild(e);
+  setTimeout(()=>e.remove(),((o.dur||1.5)+(o.delay||0))*1000+120);
+}
+function burst(emoji,n,o={}){
+  const p=headPos();
+  for(let i=0;i<n;i++) fx(emoji,p.x+rnd(-8,8),p.y+rnd(-4,6),Object.assign({delay:i*.12,dur:rnd(1.2,1.8)},o));
+}
+const ITEMS=[
+  {id:'teddy',n:'Плюшевый мишка',ico:'🧸',cat:'toy',price:30,d:'Лучший друг на полу'},
+  {id:'ball',n:'Мячик',ico:'⚽',cat:'toy',price:25,d:'Игры станут веселее'},
+  {id:'bed0',n:'Простая кроватка',ico:'🛏️',cat:'bed',price:0,excl:'bed',d:'Уютная, как раньше'},
+  {id:'bed1',n:'Облачная кроватка',ico:'☁️',cat:'bed',price:60,excl:'bed',d:'Мягкая, как облачко'},
+  {id:'bed2',n:'Лунная кроватка',ico:'🌙',cat:'bed',price:90,excl:'bed',d:'Для самых сладких снов'},
+  {id:'tulip',n:'Тюльпан',ico:'🌷',cat:'plant',price:25,d:'Маленькая весна'},
+  {id:'monstera',n:'Монстера',ico:'🪴',cat:'plant',price:40,d:'Большие зелёные листья'},
+  {id:'lamp1',n:'Звёздная лампа',ico:'⭐',cat:'lamp',price:45,excl:'lamp',d:'Тёплый свет по вечерам'},
+  {id:'lamp2',n:'Грибная лампа',ico:'🍄',cat:'lamp',price:65,excl:'lamp',d:'Сказочный ночничок'},
+  {id:'bow',n:'Бантик',ico:'🎀',cat:'acc',price:35,d:'Милота +100'},
+  {id:'hat',n:'Праздничный колпак',ico:'🎉',cat:'acc',price:50,d:'Каждый день — праздник'},
+  {id:'glasses',n:'Очки',ico:'👓',cat:'acc',price:45,d:'Умный вид'},
+  {id:'scarf',n:'Шарфик',ico:'🧣',cat:'acc',price:55,d:'Чтобы не замёрзнуть'},
+  {id:'rug',n:'Пушистый ковёр',ico:'🧶',cat:'room',price:40,d:'Мягко для лапок'},
+  {id:'wall0',n:'Обычные обои',ico:'🏠',cat:'room',price:0,excl:'wall',d:'Нежный цвет'},
+  {id:'wall1',n:'Обои с сердечками',ico:'💗',cat:'room',price:70,excl:'wall',d:'Милый узор'},
+  {id:'wall2',n:'Звёздные обои',ico:'🌌',cat:'room',price:80,excl:'wall',d:'Как ночное небо'},
+  {id:'frame',n:'Рамка с лапкой',ico:'🖼️',cat:'room',price:30,d:'На стенку'},
+  {id:'garland',n:'Гирлянда',ico:'✨',cat:'room',price:60,d:'Мерцающие огоньки'}
+];
+const CATS=[{id:'toy',n:'Игрушки',ico:'🧸'},{id:'bed',n:'Кровати',ico:'🛏️'},{id:'plant',n:'Растения',ico:'🌷'},{id:'lamp',n:'Лампы',ico:'💡'},{id:'acc',n:'Наряды',ico:'🎀'},{id:'room',n:'Комната',ico:'🏠'}];
+const itemById=id=>ITEMS.find(i=>i.id===id);
+let lampManual=null;
+function renderRoomItems(){
+  ITEMS.forEach(i=>{
+    const el=$('#it-'+i.id);
+    if(el) el.style.display=S.placed[i.id]?'':'none';
+  });
+  const g=$('#it-garland'); if(g) g.style.display=S.placed.garland?'':'none';
+  applyAcc(mainSvg()); renderGlow();
+}
+function renderGlow(){
+  const eff=lampManual!==null?lampManual:(tod==='evening'||tod==='night'||S.sleeping);
+  $('#room').classList.toggle('lamp-on',!!eff);
+  $('#glow-lamp1').style.display=S.placed.lamp1?'':'none';
+  $('#glow-lamp2').style.display=S.placed.lamp2?'':'none';
+}
+function fitRoom(){
+  const wrap=$('#roomWrap'), room=$('#room');
+  const W=wrap.clientWidth, H=wrap.clientHeight;
+  if(!W||!H) return;
+  const w=Math.max(220,Math.min(W,H*0.9));
+  room.style.width=w+'px'; room.style.height=(w/0.9)+'px';
+  room.style.fontSize=(w/360)+'em';
+}
+function buildRoom(){
+  // гирлянда
+  const path=$('#garPath'), g=$('#bulbs');
+  if(!g.children.length){
+    const len=path.getTotalLength(), cols=['#ff9ec1','#ffe27a','#a8e6cf','#cdb4ff'];
+    for(let i=0;i<=14;i++){
+      const pt=path.getPointAtLength(len*i/14);
+      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',pt.x);c.setAttribute('cy',pt.y+5);c.setAttribute('r',4.5);
+      c.setAttribute('fill',cols[i%4]);c.setAttribute('class','bulb');
+      c.style.animationDelay=(i*.25)+'s'; g.appendChild(c);
+    }
+  }
+  const foam=$('#foam');
+  if(!foam.children.length){
+    for(let i=0;i<9;i++){const f=document.createElement('span');f.textContent=i%3?'🫧':'🧼';f.style.left=rnd(18,72)+'%';f.style.top=rnd(30,82)+'%';f.style.fontSize=rnd(18,30)+'px';foam.appendChild(f);}
+  }
+  // звёзды ночного экрана
+  const ov=$('#sleepOv');
+  if(!$('.star',ov)){
+    for(let i=0;i<16;i++){
+      const s=document.createElement('span'); s.className='star'; s.textContent='✦';
+      s.style.left=rnd(4,94)+'%'; s.style.top=rnd(4,55)+'%';
+      s.style.fontSize=rnd(10,22)+'px'; s.style.animationDelay=rnd(0,2.6)+'s'; ov.appendChild(s);
+    }
+  }
+}
+
+/* ================= 7. ВРЕМЯ ================= */
+let tod='day';
+function todNow(){
+  const h=new Date().getHours();
+  return h>=5&&h<11?'morning':h>=11&&h<17?'day':h>=17&&h<21?'evening':'night';
+}
+const TOD_ICO={morning:'☀️',day:'🌤️',evening:'🌆',night:'🌙'};
+function updateTod(first){
+  const t=todNow(), changed=t!==tod;
+  tod=t;
+  const room=$('#room');
+  room.className=room.className.replace(/tod-\w+/g,'').trim()+' tod-'+t;
+  $('#todIco').textContent=TOD_ICO[t];
+  renderGlow();
+  if(changed&&!first&&!S.sleeping) say(pick(MSG[t]),5000);
+}
+
+/* ================= 11. ИНТЕРФЕЙС ================= */
+const STATS=[{k:'mood',ico:'❤️',n:'Настроение'},{k:'food',ico:'🍗',n:'Сытость'},{k:'energy',ico:'⚡',n:'Энергия'},{k:'clean',ico:'🧼',n:'Чистота'}];
+function buildStats(){
+  $('#stats').innerHTML=STATS.map(s=>`<div class="stat" data-stat="${s.k}"><span class="ico">${s.ico}</span><div class="bar"><i></i></div></div>`).join('');
+}
+function renderStats(){
+  STATS.forEach(s=>{
+    const el=$(`.stat[data-stat="${s.k}"]`); if(!el) return;
+    const v=S.stats[s.k];
+    $('i',el).style.width=Math.round(v)+'%';
+    el.classList.toggle('low',v<25);
+  });
+}
+function renderCoins(){$('#coins').textContent=Math.floor(S.coins);}
+function renderAll(){renderStats();renderCoins();renderPetState();renderTaskBadge();}
+function addCoins(n){
+  S.coins+=n; renderCoins();
+  const b=$('#coinBtn'), p=document.createElement('span');
+  p.className='coinpop'; p.textContent='+'+n; b.appendChild(p);
+  setTimeout(()=>p.remove(),1400); sfx('coin');
+}
+const lastR={};
+function reward(k,n){
+  const t=Date.now();
+  if(t-(lastR[k]||0)<12000) return 0;
+  lastR[k]=t; addCoins(n); return n;
+}
+
+/* --- секреты --- */
+const SECRETS=['name5','coins7','window','plant','hug','rug','frame','comet','butterfly'];
+function secret(id,msg){
+  if(S.secrets[id]) return false;
+  S.secrets[id]=1; addCoins(3);
+  const n=Object.keys(S.secrets).length;
+  toast(`✨ Секрет найден! (${n}/${SECRETS.length})${msg?' — '+msg:''}`,3200);
+  save(); return true;
+}
+
+/* --- задания --- */
+const TASKS=[
+  {id:'feed',t:'Покормить малыша',n:3,r:8,ico:'🍖'},
+  {id:'pet',t:'Погладить',n:5,r:8,ico:'🫳'},
+  {id:'play',t:'Поиграть',n:2,r:8,ico:'🎾'},
+  {id:'wash',t:'Помыть',n:1,r:6,ico:'🛁'},
+  {id:'game',t:'Сыграть в «Поймай сердечки»',n:1,r:10,ico:'🎮'}
+];
+function ensureTasks(){
+  const t=dayKey(new Date());
+  if(S.tasks.date!==t) S.tasks={date:t,c:{},claimed:{}};
+}
+function bump(id){
+  ensureTasks();
+  const task=TASKS.find(x=>x.id===id);
+  const before=S.tasks.c[id]||0;
+  S.tasks.c[id]=before+1;
+  if(task&&before+1===task.n) toast('📋 Задание выполнено! Забери награду',2600);
+  renderTaskBadge();
+}
+function renderTaskBadge(){
+  ensureTasks();
+  const n=TASKS.filter(t=>(S.tasks.c[t.id]||0)>=t.n&&!S.tasks.claimed[t.id]).length;
+  const b=$('#taskBadge'); b.textContent=n; b.hidden=!n;
+}
+
+/* --- шторка (модальное окно) --- */
+const sheet=$('#sheet'); let sheetClose=null;
+function openSheet(html,opt={}){
+  closeSheet();
+  sheet.innerHTML=`<div class="panel ${opt.full?'full':''}" id="panel">${html}</div>`;
+  sheet.classList.add('open'); sheetClose=opt.onClose||null;
+}
+function closeSheet(){
+  if(sheetClose){const f=sheetClose;sheetClose=null;try{f();}catch(e){}}
+  sheet.classList.remove('open'); sheet.innerHTML='';
+}
+function setPanel(html){const p=$('#panel');if(p)p.innerHTML=html;}
+sheet.addEventListener('click',e=>{if(e.target===sheet) closeSheet();});
+
+/* ================= 5. МАГАЗИН ================= */
+let shopTab='toy';
+function shopHTML(){
+  const tabs=CATS.map(c=>`<button class="tab ${c.id===shopTab?'on':''}" data-act="shop-tab" data-id="${c.id}">${c.ico} ${c.n}</button>`).join('');
+  const items=ITEMS.filter(i=>i.cat===shopTab).map(i=>{
+    const owned=S.owned[i.id], placed=S.placed[i.id]; let btn;
+    if(!owned) btn=`<button class="buy ${S.coins>=i.price?'':'poor'}" data-act="buy" data-id="${i.id}">🐾 ${i.price}</button>`;
+    else if(i.excl) btn=placed?`<span class="tag">Выбрано ✓</span>`:`<button class="buy ok" data-act="place" data-id="${i.id}">Выбрать</button>`;
+    else btn=`<button class="buy ok" data-act="place" data-id="${i.id}">${placed?(i.cat==='acc'?'Снять':'Убрать'):(i.cat==='acc'?'Надеть':'Поставить')}</button>`;
+    return `<div class="item ${placed?'on':''}"><div class="ic">${i.ico}</div><b>${i.n}</b><small>${i.d}</small>${btn}</div>`;
+  }).join('');
+  return `<button class="x" data-act="close">✕</button><h2>Магазин 🛍️</h2><p style="margin-bottom:8px">У тебя 🐾 <b>${Math.floor(S.coins)}</b> лапок</p><div class="tabs">${tabs}</div><div class="grid">${items}</div>`;
+}
+function openShop(){openSheet(shopHTML());}
+function place(id){
+  const it=itemById(id); if(!it||!S.owned[id]) return;
+  if(it.excl){
+    if(S.placed[id]) return;
+    ITEMS.filter(x=>x.excl===it.excl).forEach(x=>S.placed[x.id]=false);
+    S.placed[id]=true;
+  }else S.placed[id]=!S.placed[id];
+  renderRoomItems(); setPanel(shopHTML()); save(); sfx('tap');
+}
+function buy(id){
+  const it=itemById(id); if(!it||S.owned[id]) return;
+  if(S.coins<it.price){toast('Не хватает лапок 🐾 Поиграй или позаботься о малыше',2600);sfx('bad');return;}
+  S.coins-=it.price; S.owned[id]=1; renderCoins();
+  if(it.excl){ITEMS.filter(x=>x.excl===it.excl).forEach(x=>S.placed[x.id]=false);}
+  S.placed[id]=true;
+  renderRoomItems(); setPanel(shopHTML()); addStat('mood',6); renderAll(); save(); sfx('ok');
+  toast(`Куплено: ${it.ico} ${it.n}`);
+  burst('✨',4); say('Ого, это мне? Спасибо! 🥰',3500); faceFor('happy',2500);
+  petBody().classList.add('jump'); setTimeout(()=>petBody().classList.remove('jump'),700);
+}
+
+/* ================= 6. ДЕЙСТВИЯ ПИТОМЦА ================= */
+let busy=false,idleToken=0;
+async function act(fn){
+  if(S.sleeping){say('Тсс… малыш спит 💤',2000);return;}
+  if(busy) return;
+  busy=true; idleToken++;
+  const b=petBody(); b.classList.remove('sit','jump','lie');
+  try{await fn();}catch(e){console.error(e);}
+  finally{busy=false;b.classList.remove('shake','jump','sit');renderAll();save();}
+}
+/* --- Кормление: Аяу кормит сама --- */
+let feedRes=null,trayOpen=false,feeding=false,FOODLIST=[];
+function foodList(){
+  const fav={dog:'🍗',cat:'🐟',rabbit:'🥕'}[S.pet]||'🍗';
+  return [{e:fav,n:'Любимое',food:30,mood:7},{e:'🍎',n:'Яблоко',food:18,mood:3},{e:'🍪',n:'Печенье',food:12,mood:9}];
+}
+function doFeed(){
+  if(S.stats.food>=95){say(pick(MSG.full));faceFor('normal',1500);return Promise.resolve();}
+  return new Promise(res=>{feedRes=res;openTray();});
+}
+function openTray(){
+  trayOpen=true; feeding=false; FOODLIST=foodList();
+  const tray=$('#tray');
+  tray.innerHTML=`<div class="thint">Перетащи угощение малышу или просто тапни — положу в миску</div><div class="trow">${FOODLIST.map((f,i)=>`<button class="food-i" data-i="${i}" aria-label="${f.n}">${f.e}<small>${f.n}</small></button>`).join('')}<button class="bbtn ghost" data-act="tray-close">Хватит</button></div>`;
+  $$('.food-i',tray).forEach(el=>el.addEventListener('pointerdown',ev=>startDrag(ev,el)));
+  tray.hidden=false; $('#app').classList.add('inbath');
+  walkTo('feed'); say('Чем угостим? 🍽️',4000);
+}
+function closeTray(){
+  if(!trayOpen) return;
+  trayOpen=false; feeding=false; tFace=null;
+  $('#tray').hidden=true; $('#app').classList.remove('inbath');
+  walkTo('mid');
+  const r=feedRes; feedRes=null; if(r) r();
+}
+function startDrag(ev,el){
+  if(feeding||!trayOpen) return;
+  ev.preventDefault();
+  const f=FOODLIST[+el.dataset.i];
+  const d=document.createElement('div'); d.id='drag'; d.textContent=f.e; document.body.appendChild(d);
+  const sx=ev.clientX, sy=ev.clientY; let moved=0;
+  const put=e=>{d.style.left=e.clientX+'px';d.style.top=e.clientY+'px';};
+  const over=e=>{const r=petBody().getBoundingClientRect();return e.clientX>r.left+r.width*.1&&e.clientX<r.right-r.width*.1&&e.clientY>r.top&&e.clientY<r.bottom;};
+  put(ev);
+  const mv=e=>{put(e);moved=Math.max(moved,Math.hypot(e.clientX-sx,e.clientY-sy));const h=over(e);if((tFace==='eat')!==h){tFace=h?'eat':null;renderPetState();}};
+  const up=e=>{
+    window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+    d.remove(); tFace=null;
+    if(!trayOpen||e.type==='pointercancel'){renderPetState();return;}
+    if(over(e)) feedDirect(f);
+    else if(moved<14) feedBowl(f);
+    else renderPetState();
+  };
+  window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
+function applyFood(f){
+  const hungry=S.stats.food<30;
+  addStat('food',f.food); addStat('mood',f.mood+(hungry?4:0)); addStat('clean',-2);
+  faceFor('happy',2200); burst('💗',3); reward('feed',2); bump('feed');
+  say(pick(MSG.feed),3500); renderAll(); save();
+}
+async function feedDirect(f){
+  if(feeding) return; feeding=true;
+  faceFor('eat',1900); sfx('eat');
+  const p=headPos(); for(let i=0;i<4;i++) fx('✨',p.x+rnd(-6,6),p.y+12,{dur:1,dy:-24,delay:i*.4,size:16});
+  await wait(1900);
+  applyFood(f); feeding=false;
+  if(S.stats.food>=95&&trayOpen){say(pick(MSG.full));closeTray();}
+}
+async function feedBowl(f){
+  if(feeding) return; feeding=true;
+  await walkTo('bowl');
+  if(!trayOpen){feeding=false;return;}
+  const food=$('#food'); food.style.opacity=1;
+  fx(f.e,84,56,{cls:'fall',dy:110,dur:.9,size:26});
+  await wait(1000); faceFor('eat',2200); sfx('eat'); await wait(2200);
+  food.style.opacity=0; applyFood(f);
+  if(trayOpen) await walkTo('feed');
+  feeding=false;
+  if(S.stats.food>=95&&trayOpen){say(pick(MSG.full));closeTray();}
+}
+let tapTimes=[],pressT=null,pressFired=false;
+function petTap(){
+  if(S.sleeping){say('Zzz… 💤',1500);return;}
+  if(busy) return;
+  const now=Date.now(); tapTimes=tapTimes.filter(t=>now-t<5000); tapTimes.push(now);
+  faceFor('love',1800); sfx('tap');
+  const b=petBody(); b.classList.remove('hug'); void b.offsetWidth; b.classList.add('hug'); setTimeout(()=>b.classList.remove('hug'),1100);
+  burst('💗',3+Math.floor(Math.random()*3));
+  addStat('mood',4); reward('pet',1); bump('pet');
+  if(Math.random()<.35) say(pick(MSG.pet),2800);
+  if(tapTimes.length>=10){
+    tapTimes=[]; b.classList.add('spin'); setTimeout(()=>b.classList.remove('spin'),950);
+    burst('🌟',6); say('Ой, закружилось! 😵‍💫',3000);
+    secret('hug2');
+  }
+  renderAll(); save();
+}
+function hugPet(){
+  if(S.sleeping||busy) return;
+  faceFor('love',3000); burst('💖',8,{size:26}); addStat('mood',8);
+  say('Обнимашки! 🤗',3200); secret('hug','долгие обнимашки'); renderAll(); save();
+}
+async function doPlay(){
+  if(S.stats.energy<12){say(pick(MSG.tired));faceFor('yawn',1800);return;}
+  if(S.stats.food<10){say('Сначала давай покушаем… 🥺');return;}
+  await walkTo(S.placed.ball?'toy':'mid');
+  faceFor('happy',5200); sfx('ok');
+  if(S.placed.ball){
+    const b=$('#it-ball .ballin'); b.classList.add('bounce'); setTimeout(()=>b.classList.remove('bounce'),2600);
+  }else{
+    const p=headPos(); fx('🎾',p.x+8,p.y+12,{cls:'toss',dur:2.4,size:26});
+  }
+  if(S.placed.teddy){const t=$('#it-teddy .teddyin'); t.classList.add('hop'); setTimeout(()=>t.classList.remove('hop'),1200);}
+  const b=petBody();
+  for(let i=0;i<3;i++){
+    b.classList.add('jump'); await wait(700); b.classList.remove('jump'); burst('✨',2); await wait(60);
+  }
+  addStat('mood',14+(S.placed.ball?4:0)+(S.placed.teddy?3:0)); addStat('energy',-12); addStat('food',-6); addStat('clean',-3);
+  reward('play',2); bump('play'); say(pick(MSG.play));
+}
+/* --- Ванная: отдельная комната --- */
+let bath={on:false,scrub:0,res:null,rinsing:false,rinsed:false};
+async function swapScene(fn){
+  const r=$('#room'); r.style.transition='opacity .25s'; r.style.opacity=0;
+  await wait(270); fn(); void r.offsetWidth; r.style.opacity=1;
+  await wait(270); r.style.transition='';
+}
+function updateBathUI(){
+  const s=Math.round(bath.scrub);
+  $('#bathUI .bprog i').style.width=s+'%';
+  $('#foam').style.opacity=bath.rinsing?0:Math.min(1,s/80);
+  $('[data-act="bath-rinse"]').disabled=bath.rinsing||s<50;
+  $('#bathHint').textContent=s<50?'Води пальцем по малышу — намыль его 🧼':s<100?'Хорошо! Можно смывать 🚿 или мылить дальше':'Весь в пене! Теперь смывай 🚿';
+}
+function doWash(){
+  return new Promise(async res=>{
+    bath={on:true,scrub:0,res,rinsing:false,rinsed:false};
+    await swapScene(()=>{
+      $('#room').classList.add('bath'); $('#app').classList.add('inbath');
+      setPetPos('bath',true); $('#bathUI').hidden=false; $('#bubble').classList.remove('show');
+      petBody().classList.remove('walk'); const sv=mainSvg(); if(sv) sv.style.transform='scaleX(1)';
+      updateBathUI();
+    });
+    faceFor('happy',4000); say('Купаемся! Помоги мне помыться 🫧',4500);
+  });
+}
+async function rinse(){
+  if(!bath.on||bath.rinsing||bath.scrub<50) return;
+  bath.rinsing=true; updateBathUI();
+  const b=petBody(); b.classList.add('shake'); faceFor('happy',3200);
+  const p=headPos(); fx('🚿',p.x,p.y-16,{cls:'still',dur:3,size:36});
+  for(let i=0;i<16;i++) fx('💧',p.x+rnd(-14,14),p.y-8,{cls:'fall',dy:130,dur:.9,delay:i*.12,size:16});
+  await wait(3000);
+  b.classList.remove('shake');
+  addStat('clean',22+bath.scrub*.6); addStat('mood',4);
+  burst('✨',6); reward('wash',3); bump('wash'); sfx('ok'); say(pick(MSG.wash),3500);
+  bath.rinsed=true; await wait(900);
+  exitBath();
+}
+async function exitBath(){
+  if(!bath.on) return;
+  if(!bath.rinsed) addStat('clean',bath.scrub*.2);
+  const res=bath.res; bath.on=false;
+  await swapScene(()=>{
+    $('#room').classList.remove('bath'); $('#app').classList.remove('inbath');
+    $('#bathUI').hidden=true; $('#foam').style.opacity=0; setPetPos('mid',true);
+  });
+  renderAll(); save(); if(res) res();
+}
+function bindBath(body){
+  let down=false,lx=0,ly=0,acc=0;
+  body.addEventListener('pointerdown',e=>{if(!bath.on||bath.rinsing)return;down=true;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('pointermove',e=>{
+    if(!down||!bath.on||bath.rinsing) return;
+    const r=$('#room').getBoundingClientRect(), br=body.getBoundingClientRect();
+    const inside=e.clientX>br.left&&e.clientX<br.right&&e.clientY>br.top&&e.clientY<br.bottom;
+    const d=Math.hypot(e.clientX-lx,e.clientY-ly); lx=e.clientX; ly=e.clientY;
+    if(!inside) return;
+    bath.scrub=Math.min(100,bath.scrub+d/6.5); acc+=d;
+    if(acc>22){acc=0;fx(pick(['🫧','🫧','🧼']),(e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100,{cls:'bub',dur:1.2,dy:-30,dx:rnd(-12,12),size:rnd(16,26)});}
+    updateBathUI();
+  });
+  ['pointerup','pointercancel'].forEach(ev=>window.addEventListener(ev,()=>{down=false;}));
+}
+async function doSleep(){
+  if(S.stats.energy>90){say('Я совсем не хочу спать, я бодрый! 😄');faceFor('happy',1800);return;}
+  await walkTo('bed'); startSleep();
+}
+function startSleep(auto){
+  S.sleeping=true; petBody().classList.add('lie');
+  $('#sleepOv').classList.add('on'); $('#wakeBtn').classList.add('on');
+  renderGlow(); renderPetState();
+  say(auto?'Питомец лёг спать… 🌙':'Спокойной ночи… 🌙',3000);
+}
+function applySleepVisual(){
+  petBody().classList.add('lie'); $('#sleepOv').classList.add('on'); $('#wakeBtn').classList.add('on');
+  renderGlow();
+}
+function wake(msg){
+  if(!S.sleeping) return;
+  S.sleeping=false; petBody().classList.remove('lie');
+  $('#sleepOv').classList.remove('on'); $('#wakeBtn').classList.remove('on');
+  renderGlow(); faceFor('yawn',1500); renderAll(); save();
+  say(msg||'Ммм… уже утро? Ну, почти 😴',3500);
+  walkTo('mid');
+}
+
+/* --- живость питомца --- */
+async function idleOnce(){
+  if(busy||S.sleeping||$('#care').classList.contains('open')) return;
+  const my=idleToken, b=petBody(), r=Math.random();
+  const ok=()=>my===idleToken&&!busy&&!S.sleeping;
+  try{
+    if(r<.45){
+      await walkTo(pick(['left','mid','toy','plant','bowl','window'].filter(x=>x!==curSpot)));
+    }else if(r<.6){
+      b.classList.add('sit'); await wait(rnd(2500,4500)); if(ok()) b.classList.remove('sit');
+    }else if(r<.72){
+      await walkTo('window'); if(!ok()) return;
+      say(pick(MSG.window),3200); b.classList.add('sit'); await wait(3500); if(ok()) b.classList.remove('sit');
+    }else if(r<.84&&S.stats.mood>60){
+      b.classList.add('jump'); await wait(700); if(ok()) {b.classList.remove('jump'); burst('💗',2);}
+    }else if(r<.92){
+      const s=mainSvg(); s.classList.add('wig'); await wait(1500); s.classList.remove('wig');
+    }else if(S.placed.teddy){
+      await walkTo('toy'); if(ok()) say('Тедди, привет 🧸',2500);
+    }
+    // зевок при низкой энергии
+    if(ok()&&S.stats.energy<25){faceFor('yawn',1800);}
+  }catch(e){}
+  finally{if(my===idleToken) b.classList.remove('sit','jump');}
+}
+function idleLoop(){setTimeout(async()=>{await idleOnce();idleLoop();},rnd(4500,9000));}
+
+const warned={};
+function lowCheck(){
+  const st=S.stats;
+  [['food',MSG.hungry],['energy',MSG.sleepy],['clean',MSG.dirty],['mood',MSG.sad]].forEach(([k,pool])=>{
+    if(st[k]<28&&!warned[k]){warned[k]=1;if(!S.sleeping)say(pick(pool),5000);}
+    if(st[k]>45) warned[k]=0;
+  });
+}
+function decay(s){
+  const h=s/3600, st=S.stats;
+  const extra=(st.food<30?5:0)+(st.clean<25?3:0)+(st.energy<20?3:0);
+  st.food=clamp(st.food-18*h); st.energy=clamp(st.energy-12*h); st.clean=clamp(st.clean-10*h);
+  st.mood=clamp(st.mood-(12+extra)*h);
+  lowCheck();
+}
+function autoSpeak(){
+  if($('#care').classList.contains('open')) return;
+  const st=S.stats; let pool;
+  if(st.food<30) pool=MSG.hungry; else if(st.energy<25) pool=MSG.sleepy; else if(st.clean<25) pool=MSG.dirty; else if(st.mood<30) pool=MSG.sad;
+  else{const r=Math.random();pool=r<.4?MSG.chat:r<.62?MSG.own[S.pet]:r<.85?MSG[tod]:MSG.thoughts;}
+  say(pick(pool),4800);
+}
+
+/* ================= 9. СЮРПРИЗЫ ================= */
+function spawnEvent(emoji,cls,onTap,life){
+  const e=document.createElement('button');
+  e.className='ev '+cls; e.textContent=emoji;
+  if(cls==='gift'){e.style.left=rnd(15,75)+'%';e.style.top=rnd(62,76)+'%';}
+  e.addEventListener('click',ev=>{ev.stopPropagation();e.remove();onTap();save();});
+  $('#evLayer').appendChild(e);
+  setTimeout(()=>e.remove(),life);
+}
+function randomEvents(){
+  if(S.sleeping||$('#care').classList.contains('open')) return;
+  const r=Math.random();
+  if(r<.12&&(tod==='morning'||tod==='day')){
+    spawnEvent('🦋','butterfly',()=>{addCoins(2);secret('butterfly','поймала бабочку');burst('✨',3);say('Ты поймала бабочку! 🦋');},9000);
+  }else if(r<.22&&tod==='night'){
+    spawnEvent('🌠','star',()=>{addCoins(2);secret('comet','звезда');say('Загадай желание! ✨',4500);},3300);
+  }else if(r<.28){
+    spawnEvent('🎁','gift',()=>{const n=3+Math.floor(Math.random()*6);addCoins(n);burst('🎉',4);say(`Подарочек! Тут ${n} лапок 🐾`);},12000);
+  }
+  letterCheck();
+}
+function letterCheck(){
+  if(S.letters.pending!==null||S.sleeping) return;
+  const now=Date.now(), L=S.letters;
+  const first=L.count===0, due=first?(now-S.created>15*60*1000||S.days>=2):(now-L.last>3*3600*1000);
+  if(due&&Math.random()<.2) showLetter();
+}
+function showLetter(){
+  const L=S.letters; let un=LETTERS.map((_,i)=>i).filter(i=>!L.read.includes(i));
+  if(!un.length){L.read=[];un=LETTERS.map((_,i)=>i);}
+  L.pending=pick(un); L.last=Date.now();
+  $('#letterBtn').hidden=false;
+  say('Игорь оставил тебе маленькое сообщение 💌',6500);
+  save();
+}
+function openLetter(){
+  const L=S.letters; if(L.pending===null) {$('#letterBtn').hidden=true;return;}
+  const txt=LETTERS[L.pending];
+  openSheet(`<div class="env">💌</div><h2>От Игоря</h2><div class="letter">${esc(txt)}</div><div class="row"><button class="btn" data-act="letter-ok">Спасибо 🤍</button></div>`);
+}
+function letterOk(){
+  const L=S.letters;
+  if(L.pending!==null){L.read.push(L.pending);L.pending=null;L.count++;}
+  $('#letterBtn').hidden=true; closeSheet();
+  addStat('mood',12); addCoins(4); burst('💗',6); say('Это так приятно 🥹'); renderAll(); save();
+}
+
+/* ================= ЕЖЕДНЕВНЫЙ БОНУС ================= */
+function dailyCheck(away){
+  const t=dayKey(new Date());
+  if(S.lastDay===t) return false;
+  const y=dayKey(new Date(Date.now()-86400000));
+  S.streak=S.lastDay===y?S.streak+1:1; S.days++; S.lastDay=t;
+  const bonus=Math.min(10+S.streak*2,30); S.coins+=bonus; renderCoins();
+  const g=tod==='morning'?'Доброе утро':tod==='day'?'Добрый день':tod==='evening'?'Добрый вечер':'Доброй ночи';
+  openSheet(`<div class="env">🌸</div><h2>${g}, Аяу!</h2><p>${esc(S.name)} очень рад тебя видеть.<br>Ежедневный бонус: <b>+${bonus} 🐾</b><br>Дней подряд: <b>${S.streak}</b></p><div class="row"><button class="btn" data-act="close">Ура! 🐾</button></div>`);
+  save(); return true;
+}
+
+/* ================= МИНИ-ИГРА ================= */
+const G={on:false,score:0,endAt:0,tick:null,spawn:null};
+function openGame(){
+  if(S.sleeping){say('Тсс… малыш спит 💤',2000);return;}
+  openSheet(`<div class="gm"><button class="x" data-act="close">✕</button><div style="font-size:64px">💗</div><h2>Поймай сердечки</h2><p>20 секунд. Тапай по сердечкам 💗, золотые лапки 🐾 дают больше, а тучки ☁️ лучше обходить стороной!</p><div class="best">Твой рекорд: ${S.best}</div><button class="btn big" data-act="game-start">Играть</button></div>`,{full:true,onClose:stopGame});
+}
+function startGameRound(){
+  G.on=true; G.score=0; G.endAt=Date.now()+20000;
+  setPanel(`<button class="x" data-act="close">✕</button><div class="ghead"><span>⏱ <b id="gT">20</b></span><span>💗 <b id="gS">0</b></span></div><div id="gArea"></div>`);
+  clearInterval(G.tick); clearTimeout(G.spawn);
+  G.tick=setInterval(()=>{
+    const left=Math.max(0,Math.ceil((G.endAt-Date.now())/1000));
+    const t=$('#gT'); if(t) t.textContent=left;
+    if(Date.now()>=G.endAt) finishGame();
+  },100);
+  const loop=()=>{
+    if(!G.on) return;
+    spawnTarget();
+    const prog=1-(G.endAt-Date.now())/20000;
+    G.spawn=setTimeout(loop,Math.max(380,750-prog*340)+rnd(-60,60));
+  };
+  loop();
+}
+function spawnTarget(){
+  const a=$('#gArea'); if(!a) return;
+  const r=Math.random(), type=r<.14?'gold':r<.32?'cloud':'heart';
+  const b=document.createElement('button');
+  b.className='tg '+type; b.textContent=type==='gold'?'🐾':type==='cloud'?'☁️':'💗';
+  const w=a.clientWidth, h=a.clientHeight, size=62;
+  b.style.left=rnd(6,Math.max(8,w-size-6))+'px'; b.style.top=rnd(6,Math.max(8,h-size-6))+'px';
+  const life=type==='gold'?1100:1700;
+  b.style.animationDuration=life+'ms';
+  b.addEventListener('pointerdown',ev=>{ev.preventDefault();hitTarget(b,type);});
+  a.appendChild(b); setTimeout(()=>b.remove(),life);
+}
+function hitTarget(b,type){
+  if(!b.isConnected||b.dataset.h) return; b.dataset.h=1;
+  const v=type==='gold'?3:type==='cloud'?-2:1;
+  G.score=Math.max(0,G.score+v);
+  const a=$('#gArea'), p=document.createElement('span');
+  p.className='gpop'; p.textContent=(v>0?'+':'')+v; p.style.left=b.style.left; p.style.top=b.style.top;
+  if(a) a.appendChild(p); setTimeout(()=>p.remove(),850);
+  b.classList.add('pop'); setTimeout(()=>b.remove(),200);
+  const s=$('#gS'); if(s) s.textContent=G.score;
+  sfx(v>0?'tap':'bad');
+}
+function stopGame(){G.on=false;clearInterval(G.tick);clearTimeout(G.spawn);}
+function finishGame(){
+  if(!G.on) return; stopGame();
+  const sc=G.score, coins=Math.min(3+Math.floor(sc/3),25);
+  const newBest=sc>S.best; if(newBest) S.best=sc;
+  S.games++; S.coins+=coins;
+  addStat('mood',Math.min(25,8+Math.floor(sc/2))); addStat('energy',5); addStat('food',-4);
+  bump('game'); renderAll(); save(); sfx('ok');
+  setPanel(`<div class="gm"><button class="x" data-act="close">✕</button><div style="font-size:64px">🐾</div><h2>Ты набрала ${sc} очков! 🐾</h2><p>Награда: <b>+${coins} 🐾</b>${newBest&&sc>0?'<br>🎉 Новый рекорд!':''}<br>${esc(S.name)} в восторге!</p><div class="best">Рекорд: ${S.best}</div><div class="row"><button class="btn" data-act="game-start">Ещё раз</button><button class="btn ghost" data-act="close">Вернуться</button></div></div>`);
+  setTimeout(()=>{faceFor('happy',3000);burst('💗',5);say(sc>=20?'Вот это да! Ты чемпионка! 🏆':'Было весело! Ещё разок? 🎮');},300);
+}
+
+/* ================= 10. РЕЖИМ «МНЕ ПЛОХО» ================= */
+let breathT=null;
+const TIPS=[
+  ['♨️','Тепло на низ живота — грелка или тёплое полотенце через ткань, чтобы не обжечь кожу.'],
+  ['🚿','Тёплый душ или ванна — тепло помогает мышцам расслабиться.'],
+  ['💧','Пей воду или тёплый чай небольшими глотками.'],
+  ['🛌','Отдых — ляг поудобнее, можно подтянуть колени к животу.'],
+  ['🚶','Лёгкое движение или растяжка — только если комфортно, без усилий.'],
+  ['💊','Безрецептурное обезболивающее — по инструкции на упаковке и только если оно тебе подходит. Если сомневаешься, спроси врача или фармацевта.']
+];
+function openCare(){
+  const el=$('#care');
+  el.innerHTML=`<div class="care-in">
+    <button class="x" data-act="care-close" aria-label="Закрыть">✕</button>
+    <div class="care-pet" id="carePet">${petSVG(S.pet)}</div>
+    <p class="care-msg" id="careMsg">Иди сюда. Сегодня я буду заботиться о тебе 🤍</p>
+    <div class="card" id="careCard"><h3>Начались боли?</h3><div class="row"><button class="btn" data-act="pain-yes">Да</button><button class="btn ghost" data-act="pain-no">Нет</button></div></div>
+    <div id="careMore"></div>
+    <div class="row"><button class="btn ghost" data-act="hug-care">🫂 Обнять</button><button class="btn" data-act="care-close">Мне лучше</button></div>
+  </div>`;
+  const svg=$('#carePet svg'); applyAcc(svg); svg.setAttribute('data-face','love');
+  el.classList.add('open'); el.scrollTop=0;
+}
+function closeCare(){
+  clearInterval(breathT); breathT=null;
+  $('#care').classList.remove('open'); $('#care').innerHTML='';
+  addStat('mood',5); renderAll(); save();
+  say('Я рядом, если что 🤍',5000);
+}
+function painYes(){
+  $('#careMsg').textContent='Мне очень жаль 🤍 Давай попробуем немного помочь.';
+  $('#careCard').innerHTML=`<h3>Что может помочь</h3><p style="text-align:center;color:var(--ink2);font-size:13px;margin:4px 0 6px">Нажимай на то, что уже попробовала</p>
+  ${TIPS.map(t=>`<div class="tip" data-act="tip"><i>${t[0]}</i><span>${t[1]}</span></div>`).join('')}
+  <div class="warn">⚠️ Если боль необычно сильная, внезапная, значительно отличается от обычной или сопровождается тревожными симптомами, стоит обратиться за медицинской помощью.</div>`;
+  $('#careMore').innerHTML='';
+}
+function painNo(){
+  $('#careMsg').textContent='Хорошо 🤍 Тогда просто побудем вместе.';
+  $('#careCard').innerHTML=`<h3>Давай подышим вместе</h3><div class="breath" id="breathTxt">Вдох…</div><p style="text-align:center;color:var(--ink2);font-size:14px">Медленно вдыхай носом, медленно выдыхай ртом.</p><div class="row"><button class="btn ghost" data-act="pain-yes">Всё-таки покажи советы</button></div>`;
+  clearInterval(breathT);
+  const tick=()=>{
+    const t=$('#breathTxt'); if(!t){clearInterval(breathT);return;}
+    t.textContent='Вдох…'; setTimeout(()=>{const x=$('#breathTxt'); if(x) x.textContent='Выдох…';},4000);
+  };
+  tick(); breathT=setInterval(tick,10000);
+}
+function hugCare(){
+  const lines=['Я рядом.','Дыши медленно. Я никуда не уйду.','Ты справляешься 🤍','Тёплые обнимашки отправлены 🫂'];
+  $('#careMsg').textContent=pick(lines);
+  const holder=$('#carePet'); if(!holder) return;
+  for(let i=0;i<6;i++){
+    const s=document.createElement('span'); s.textContent=pick(['💗','🤍','💞']);
+    s.style.cssText=`position:absolute;left:${rnd(10,80)}%;top:${rnd(20,60)}%;font-size:${rnd(20,30)}px;animation:rise 1.6s ease-out forwards;animation-delay:${i*.12}s;--dx:${rnd(-20,20)}px;--dy:-70px;opacity:0`;
+    holder.appendChild(s); setTimeout(()=>s.remove(),2200);
+  }
+  addStat('mood',4);
+}
+
+/* ================= НАСТРОЙКИ / ЗАДАНИЯ ================= */
+function tasksHTML(){
+  ensureTasks();
+  const rows=TASKS.map(t=>{
+    const c=Math.min(S.tasks.c[t.id]||0,t.n), done=c>=t.n, cl=S.tasks.claimed[t.id];
+    const btn=cl?`<span class="tag" style="min-width:84px">Получено ✓</span>`:done?`<button class="buy ok" data-act="claim" data-id="${t.id}">+${t.r} 🐾</button>`:`<span style="min-width:84px;text-align:center;font-weight:800;color:var(--ink2)">${c}/${t.n}</span>`;
+    return `<div class="task"><div class="ti">${t.ico}</div><div class="tt">${t.t}<div class="pg"><i style="width:${c/t.n*100}%"></i></div></div>${btn}</div>`;
+  }).join('');
+  return `<button class="x" data-act="close">✕</button><h2>Задания на сегодня 📋</h2>${rows}<p style="margin-top:8px;font-size:13px">Новые задания появятся завтра 🌙</p>`;
+}
+function settingsHTML(){
+  const n=Object.keys(S.secrets).length;
+  return `<button class="x" data-act="close">✕</button><h2>Настройки ⚙️</h2>
+  <div class="set"><span>Звуки</span><button class="sw ${S.sound?'on':''}" data-act="sound" aria-label="Звуки"></button></div>
+  <div class="set"><input id="renameIn" maxlength="14" value="${esc(S.name)}" aria-label="Имя питомца"><button class="btn" style="height:40px;padding:0 16px" data-act="rename">Имя</button></div>
+  <div class="set"><span>Секретов найдено</span><b>${n} / ${SECRETS.length}</b></div>
+  <div class="set"><span>Письма от Игоря</span><b>${S.letters.count} 💌</b></div>
+  <div class="set"><span>Лучший счёт в игре</span><b>${S.best}</b></div>
+  <div class="row"><button class="btn ghost" id="resetBtn" data-act="reset">Начать заново</button></div>
+  <p style="margin-top:14px;font-size:13px">Сделано специально для Аяу 🤍</p>`;
+}
+let resetArmed=false;
+
+/* ================= ОБРАБОТКА НАЖАТИЙ ================= */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]'); if(!t) return;
+  const a=t.dataset.act, id=t.dataset.id;
+  switch(a){
+    case 'feed': sfx('tap'); act(doFeed); break;
+    case 'pet': petTap(); break;
+    case 'play': sfx('tap'); act(doPlay); break;
+    case 'wash': sfx('tap'); act(doWash); break;
+    case 'sleep': sfx('tap'); act(doSleep); break;
+    case 'wake': wake(); break;
+    case 'bath-rinse': rinse(); break;
+    case 'bath-out': exitBath(); break;
+    case 'tray-close': closeTray(); break;
+    case 'shop': openShop(); break;
+    case 'tasks': openSheet(tasksHTML()); break;
+    case 'settings': resetArmed=false; openSheet(settingsHTML()); break;
+    case 'game': openGame(); break;
+    case 'game-start': startGameRound(); break;
+    case 'care': openCare(); break;
+    case 'care-close': closeCare(); break;
+    case 'pain-yes': painYes(); break;
+    case 'pain-no': painNo(); break;
+    case 'hug-care': hugCare(); break;
+    case 'tip': t.classList.toggle('done'); sfx('tap'); break;
+    case 'close': closeSheet(); break;
+    case 'shop-tab': shopTab=id; setPanel(shopHTML()); break;
+    case 'buy': buy(id); break;
+    case 'place': place(id); break;
+    case 'letter': openLetter(); break;
+    case 'letter-ok': letterOk(); break;
+    case 'claim': {
+      const task=TASKS.find(x=>x.id===id);
+      if(task&&(S.tasks.c[id]||0)>=task.n&&!S.tasks.claimed[id]){
+        S.tasks.claimed[id]=1; addCoins(task.r); setPanel(tasksHTML()); renderTaskBadge(); save();
+      }
+      break;
+    }
+    case 'sound': S.sound=!S.sound; t.classList.toggle('on',S.sound); sfx('ok'); save(); break;
+    case 'rename': {
+      const v=($('#renameIn').value||'').trim().slice(0,14);
+      if(v){S.name=v;$('#petName').textContent=v;document.title=v+' 🐾';save();toast('Имя сохранено 🐾');}
+      break;
+    }
+    case 'reset':
+      if(!resetArmed){resetArmed=true;t.textContent='Точно? Нажми ещё раз';setTimeout(()=>{resetArmed=false;if(t.isConnected)t.textContent='Начать заново';},4000);}
+      else{try{localStorage.removeItem(KEY);}catch(err){} S=defaults(); location.reload();}
+      break;
+  }
+});
+
+/* ================= ЖЕСТЫ ПО КОМНАТЕ ================= */
+let nameTaps=[],coinTaps=[];
+function bindRoom(){
+  const body=petBody();
+  body.addEventListener('click',()=>{if(bath.on) return;if(pressFired){pressFired=false;return;}petTap();});
+  body.addEventListener('pointerdown',()=>{
+    if(bath.on) return;
+    pressFired=false; clearTimeout(pressT);
+    pressT=setTimeout(()=>{pressFired=true;hugPet();},800);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>body.addEventListener(ev,()=>clearTimeout(pressT)));
+  bindBath(body);
+  $('#roomSvg').addEventListener('click',e=>{
+    const h=e.target.closest('[data-hit]'); if(!h) return;
+    const k=h.dataset.hit;
+    if(k==='window'){
+      secret('window','выглянула в окно');
+      if(tod==='night'){fx('✨',48,14,{dur:2,dy:-20});say('Звёздочки мерцают ✨');}
+      else{const bd=document.createElement('span');spawnEvent('🐦','butterfly',()=>{addCoins(1);say('Птичка! 🐦');},9000);say(pick(MSG.window));}
+    }else if(k==='plant'){
+      secret('plant','полила растение');
+      fx('🌸',82,66,{dur:1.6});fx('🌱',82,72,{dur:1.6,delay:.2});say('Растение растёт! 🌱');
+    }else if(k==='rug'){
+      secret('rug','танцы на ковре');
+      if(!busy&&!S.sleeping) act(async()=>{await walkTo('mid');faceFor('happy',2500);const b=petBody();b.classList.add('spin');burst('🎵',4);await wait(1000);b.classList.remove('spin');say('Танцуем! 💃');});
+    }else if(k==='frame'){
+      secret('frame','рамка с лапкой');say('Здесь отпечаток моей лапки 🐾');
+    }else if(k==='lamp'){
+      const eff=$('#room').classList.contains('lamp-on');lampManual=!eff;renderGlow();say('Щёлк! 💡',1800);sfx('tap');
+    }else if(k==='teddy'){
+      say('Тедди — мой лучший друг 🧸');burst('🧸',1);
+    }else if(k==='ball'){
+      const b=$('#it-ball .ballin');b.classList.add('bounce');setTimeout(()=>b.classList.remove('bounce'),2600);
+    }else if(k==='bowl'){
+      say(S.stats.food<50?'Миска ждёт вкусняшек 🍗':'Пока не голоден 😌');
+    }
+  });
+  $('#petName').addEventListener('click',()=>{
+    const n=Date.now(); nameTaps=nameTaps.filter(t=>n-t<4000); nameTaps.push(n);
+    if(nameTaps.length>=5){nameTaps=[];secret('name5');say('Ты уже лучше, чем думаешь 🤍',5000);}
+  });
+  $('#coinBtn').addEventListener('click',()=>{
+    const n=Date.now(); coinTaps=coinTaps.filter(t=>n-t<5000); coinTaps.push(n);
+    if(coinTaps.length>=7){coinTaps=[];if(secret('coins7','лапки')) say('Тайные лапки! 🐾');else toast('Лапок много не бывает 🐾');}
+  });
+  $$('#stats .stat').forEach(el=>el.addEventListener('click',()=>{
+    const s=STATS.find(x=>x.k===el.dataset.stat);
+    toast(`${s.ico} ${s.n}: ${Math.round(S.stats[s.k])}/100`,1600);
+  }));
+}
+
+/* ================= ГЛАВНЫЙ ЦИКЛ ================= */
+let sec=0,nextSpeak=0,nextEvent=0,started=false;
+function loop(){
+  sec++;
+  const now=Date.now();
+  if(S.sleeping){
+    S.stats.energy=clamp(S.stats.energy+3.2); S.stats.mood=clamp(S.stats.mood+.2); S.stats.food=clamp(S.stats.food-.02);
+    if(sec%3===0){const p=headPos();fx('💤',p.x+8,p.y-4,{dur:2.4,dx:14,dy:-60,size:20});}
+    if(S.stats.energy>=100) wake('Выспался! Я полон сил ⚡');
+  }else if(sec%10===0){
+    decay(10);
+    if(tod==='night'&&S.stats.energy<28&&!busy&&now-S.lastAuto>30*60*1000&&!$('#care').classList.contains('open')&&!sheet.classList.contains('open')){
+      S.lastAuto=now; busy=true; idleToken++;
+      walkTo('bed').then(()=>{busy=false;if(!S.sleeping)startSleep(true);});
+    }
+  }
+  if(sec%30===0){updateTod();save();}
+  if(!S.sleeping&&now>nextSpeak){nextSpeak=now+rnd(26000,46000);autoSpeak();}
+  if(now>nextEvent){nextEvent=now+rnd(15000,30000);randomEvents();}
+  renderStats(); renderPetState();
+}
+
+/* ================= ЗАПУСК ================= */
+function startGame(intro){
+  $('#onboard').hidden=true; $('#app').hidden=false;
+  buildStats(); buildRoom(); fitRoom(); bindRoomOnce();
+  $('#petName').textContent=S.name; document.title=S.name+' 🐾';
+  petBody().innerHTML=petSVG(S.pet);
+  const away=intro?0:applyOffline();
+  ensureTasks(); updateTod(true); renderRoomItems(); renderAll();
+  setPetPos(S.sleeping?'bed':'mid',true);
+  if(S.sleeping) applySleepVisual();
+  nextSpeak=Date.now()+9000; nextEvent=Date.now()+20000;
+  if(S.letters.pending!==null) $('#letterBtn').hidden=false;
+  if(!intro){
+    const bonus=dailyCheck(away);
+    if(!bonus&&away>0.5) say(pick(MSG.back),6000);
+    else if(!bonus) say(pick(MSG[tod]),4500);
+  }else{
+    const b=petBody(); b.classList.add('jump');
+    setTimeout(()=>{b.classList.remove('jump');say(`Привет! Меня зовут ${S.name}. А ты — Аяу, да? 🐾`,6000);burst('💗',5);},700);
+  }
+  if(!started){started=true;setInterval(loop,1000);idleLoop();}
+  save();
+}
+let roomBound=false;
+function bindRoomOnce(){if(roomBound)return;roomBound=true;bindRoom();}
+
+/* --- первый запуск --- */
+const SUGGEST=['Мочи','Пушок','Лаки','Зефирка','Бублик','Ириска','Моти','Облачко'];
+function showOnboard(){
+  const ob=$('#onboard'); ob.hidden=false; $('#app').hidden=true;
+  let chosen=null;
+  ob.innerHTML=`<div class="ob"><h1>Привет, Аяу 🐾</h1><p>У тебя появился маленький друг.<br>Кого выберешь?</p>
+  <div class="choose">${Object.keys(PETS).map(k=>`<button class="pc" data-pet="${k}"><div class="pv">${petSVG(k)}</div>${PETS[k].emoji} ${PETS[k].label}</button>`).join('')}</div>
+  <button class="btn big" id="obNext" style="opacity:.5">Дальше</button></div>`;
+  $$('.pc',ob).forEach(b=>{
+    const sv=$('svg',b); sv.setAttribute('data-face','happy');
+    b.addEventListener('click',()=>{
+      chosen=b.dataset.pet; $$('.pc',ob).forEach(x=>x.classList.toggle('on',x===b)); $('#obNext').style.opacity=1; sfx('tap');
+    });
+  });
+  $('#obNext').addEventListener('click',()=>{
+    if(!chosen){toast('Выбери малыша 🐾');return;}
+    nameStep(chosen);
+  });
+}
+function nameStep(type){
+  const ob=$('#onboard');
+  ob.innerHTML=`<div class="ob"><div class="big-pet">${petSVG(type)}</div><h1>Как назовём твоего малыша?</h1>
+  <input id="obName" maxlength="14" placeholder="Например, ${pick(SUGGEST)}" autocomplete="off">
+  <div class="chips">${SUGGEST.slice(0,6).map(n=>`<button class="chip" data-n="${n}">${n}</button>`).join('')}</div>
+  <button class="btn big" id="obGo">Познакомиться 🐾</button></div>`;
+  const sv=$('.big-pet svg',ob); sv.setAttribute('data-face','love');
+  $$('.chip',ob).forEach(c=>c.addEventListener('click',()=>{$('#obName').value=c.dataset.n;}));
+  $('#obGo').addEventListener('click',()=>{
+    const name=($('#obName').value||'').trim().slice(0,14)||pick(SUGGEST);
+    S=defaults(); S.pet=type; S.name=name;
+    S.lastDay=dayKey(new Date()); S.days=1; S.streak=1; S.created=Date.now();
+    save(); startGame(true);
+  });
+}
+
+window.addEventListener('resize',fitRoom);
+window.addEventListener('orientationchange',()=>setTimeout(fitRoom,200));
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){save();return;}
+  if(!S.pet||$('#app').hidden) return;
+  const away=applyOffline();
+  if(away>0.02){
+    S.lastSeen=Date.now(); renderAll();
+    if(!S.sleeping){setPetPos('mid');}
+    else{wake();}
+    if(away>0.5) say(pick(MSG.back),6000);
+    updateTod(true);
+    dailyCheck(away);
+  }
+  fitRoom();
+});
+window.addEventListener('pagehide',save);
+
+load();
+if(S.pet) startGame(false); else showOnboard();
+})();
+</script>
+</body>
+</html>
